@@ -17,7 +17,7 @@ load_dotenv()
 # ---- Groq / OpenAI-compatible settings ----
 
 GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
-GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama3-8b-8192")
+GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
 GROQ_BASE_URL: str = os.getenv(
     "GROQ_BASE_URL",
     "https://api.groq.com/openai/v1/chat/completions",

@@ -160,7 +160,7 @@ Open the `.env` file in any text editor and fill in your values:
 
 ```env
 GROQ_API_KEY=gsk_your_actual_api_key_here
-GROQ_MODEL=llama3-8b-8192
+GROQ_MODEL=llama-3.1-8b-instant
 ```
 
 > 🔗 Get a free API key at [console.groq.com](https://console.groq.com)
@@ -170,7 +170,7 @@ GROQ_MODEL=llama3-8b-8192
 | Variable        | Description                                   | Default                                            |
 | --------------- | --------------------------------------------- | -------------------------------------------------- |
 | `GROQ_API_KEY`  | Your Groq API key                             | *(required)*                                       |
-| `GROQ_MODEL`    | Chat model to use                             | `llama3-8b-8192`                                   |
+| `GROQ_MODEL`    | Chat model to use                             | `llama-3.1-8b-instant`                                   |
 | `GROQ_BASE_URL` | Groq / OpenAI-compatible completions endpoint | `https://api.groq.com/openai/v1/chat/completions`  |
 
 > ⚠️ **Never commit your `.env` file.** It is already listed in `.gitignore`.
