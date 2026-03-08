@@ -108,7 +108,31 @@ This installs:
 
 ---
 
-## 🔑 4. Configure Environment Variables
+## � 4. Verify Your Setup
+
+Before continuing, run these commands to confirm everything is installed correctly:
+
+### Check Python version (must be 3.9 or higher)
+
+```bash
+python --version
+```
+
+> 💡 On **macOS / Linux**, use `python3 --version` instead.
+
+### Check installed packages
+
+```bash
+pip list
+```
+
+You should see `fastapi`, `uvicorn`, `pydantic`, `requests`, and `python-dotenv` in the list.
+
+> ⚠️ If any package is missing, re-run: `pip install -r requirements.txt`
+
+---
+
+## 🔑 5. Configure Environment Variables
 
 ### Step A — Create the `.env` file
 
@@ -153,7 +177,7 @@ GROQ_MODEL=llama3-8b-8192
 
 ---
 
-## ▶️ 5. Run the Server
+## ▶️ 6. Run the Server
 
 Make sure your virtual environment is activated, then run:
 
@@ -175,7 +199,7 @@ The server is now running at **http://localhost:8000**.
 
 ---
 
-## 🧪 6. Open API Documentation (Swagger UI)
+## 🧪 7. Open API Documentation (Swagger UI)
 
 Open your browser and go to:
 
@@ -196,7 +220,7 @@ You can **test every endpoint** directly from the browser without writing any co
 
 ---
 
-## 💬 7. Example Request
+## 💬 8. Example Request
 
 ### `POST /ai/chat`
 
@@ -246,7 +270,7 @@ curl -X POST http://localhost:8000/ai/chat -H "Content-Type: application/json" -
 
 ---
 
-## 🛠️ 8. Troubleshooting
+## 🛠️ 9. Troubleshooting
 
 ### `python: command not found`
 
