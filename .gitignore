@@ -1,0 +1,35 @@
+# -------------------------------------------------------
+# .gitignore — GenAI FastAPI Backend
+# -------------------------------------------------------
+
+# Environment variables (NEVER commit secrets)
+.env
+
+# Python bytecode
+__pycache__/
+**__pycache__/
+*.pyc
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
