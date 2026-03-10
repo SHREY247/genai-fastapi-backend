@@ -1,4 +1,4 @@
-# 🚀 GenAI FastAPI Backend
+# GenAI FastAPI Backend
 
 A **minimal, production-style** FastAPI backend that wraps a **Groq / OpenAI-compatible** LLM API.  
 Built as a teaching scaffold for the **AI Engineering** course.
@@ -12,7 +12,7 @@ Students will learn how to:
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 genai-fastapi-backend/
@@ -43,7 +43,7 @@ genai-fastapi-backend/
 
 ---
 
-## ✅ Prerequisites
+## Prerequisites
 
 Before you begin, make sure you have the following installed:
 
@@ -53,11 +53,11 @@ Before you begin, make sure you have the following installed:
 | **pip**             | (bundled)       | `pip --version`        |
 | **Git** *(optional)* | any             | `git --version`        |
 
-> 💡 On **macOS / Linux**, you may need to use `python3` and `pip3` instead of `python` and `pip`.
+> On **macOS / Linux**, you may need to use `python3` and `pip3` instead of `python` and `pip`.
 
 ---
 
-## 📥 1. Clone the Repository
+## 1. Clone the Repository
 
 ```bash
 git clone https://github.com/SHREY247/genai-fastapi-backend.git
@@ -68,7 +68,7 @@ Or download the ZIP from GitHub and extract it manually.
 
 ---
 
-## 🐍 2. Create a Virtual Environment
+## 2. Create a Virtual Environment
 
 A virtual environment keeps project dependencies isolated from your system Python.
 
@@ -86,11 +86,11 @@ python3 -m venv venv
 source venv/bin/activate
 ```
 
-> ✅ After activation you should see `(venv)` at the beginning of your terminal prompt.
+> After activation you should see `(venv)` at the beginning of your terminal prompt.
 
 ---
 
-## 📦 3. Install Dependencies
+## 3. Install Dependencies
 
 With the virtual environment **activated**, run:
 
@@ -108,7 +108,7 @@ This installs:
 
 ---
 
-## � 4. Verify Your Setup
+## 4. Verify Your Setup
 
 Before continuing, run these commands to confirm everything is installed correctly:
 
@@ -118,7 +118,7 @@ Before continuing, run these commands to confirm everything is installed correct
 python --version
 ```
 
-> 💡 On **macOS / Linux**, use `python3 --version` instead.
+> On **macOS / Linux**, use `python3 --version` instead.
 
 ### Check installed packages
 
@@ -128,11 +128,11 @@ pip list
 
 You should see `fastapi`, `uvicorn`, `pydantic`, `requests`, and `python-dotenv` in the list.
 
-> ⚠️ If any package is missing, re-run: `pip install -r requirements.txt`
+> If any package is missing, re-run: `pip install -r requirements.txt`
 
 ---
 
-## 🔑 5. Configure Environment Variables
+## 5. Configure Environment Variables
 
 ### Step A — Create the `.env` file
 
@@ -163,7 +163,7 @@ GROQ_API_KEY=gsk_your_actual_api_key_here
 GROQ_MODEL=llama-3.1-8b-instant
 ```
 
-> 🔗 Get a free API key at [console.groq.com](https://console.groq.com)
+> Get a free API key at [console.groq.com](https://console.groq.com)
 
 ### Environment Variables Reference
 
@@ -173,11 +173,11 @@ GROQ_MODEL=llama-3.1-8b-instant
 | `GROQ_MODEL`    | Chat model to use                             | `llama-3.1-8b-instant`                                   |
 | `GROQ_BASE_URL` | Groq / OpenAI-compatible completions endpoint | `https://api.groq.com/openai/v1/chat/completions`  |
 
-> ⚠️ **Never commit your `.env` file.** It is already listed in `.gitignore`.
+> **Never commit your `.env` file.** It is already listed in `.gitignore`.
 
 ---
 
-## ▶️ 6. Run the Server
+## 6. Run the Server
 
 Make sure your virtual environment is activated, then run:
 
@@ -195,11 +195,11 @@ INFO:     Application startup complete.
 
 The server is now running at **http://localhost:8000**.
 
-> 💡 The `--reload` flag auto-restarts the server when you edit code — useful during development.
+> The `--reload` flag auto-restarts the server when you edit code — useful during development.
 
 ---
 
-## 🧪 7. Open API Documentation (Swagger UI)
+## 7. Open API Documentation (Swagger UI)
 
 Open your browser and go to:
 
@@ -220,7 +220,7 @@ You can **test every endpoint** directly from the browser without writing any co
 
 ---
 
-## 💬 8. Example Request
+## 8. Example Request
 
 ### `POST /ai/chat`
 
@@ -270,7 +270,7 @@ curl -X POST http://localhost:8000/ai/chat -H "Content-Type: application/json" -
 
 ---
 
-## 🛠️ 9. Troubleshooting
+## 9. Troubleshooting
 
 ### `python: command not found`
 
@@ -320,18 +320,18 @@ Make sure you:
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
 This repo is the **starting point** for future lessons:
 
-- 🔹 Embeddings & vector representations
-- 🔹 Vector database integration (ChromaDB / Pinecone)
-- 🔹 RAG (Retrieval-Augmented Generation) pipelines
-- 🔹 Streaming responses
-- 🔹 Authentication & rate limiting
+- Embeddings & vector representations
+- Vector database integration (ChromaDB / Pinecone)
+- RAG (Retrieval-Augmented Generation) pipelines
+- Streaming responses
+- Authentication & rate limiting
 
 ---
 
-## 📄 License
+## License
 
 This project is for **educational purposes** as part of the AI Engineering course.
