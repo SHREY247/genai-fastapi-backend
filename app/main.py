@@ -10,23 +10,28 @@ Run with:
 """
 
 from fastapi import FastAPI
-
 from app.api.routes import health, chat
+from app.core.logging import setup_logging
+
+# Setup application-wide logging
+setup_logging()
 
 # ---- Create the FastAPI app ----
 app = FastAPI(
-    title="GenAI FastAPI Backend",
-    description="A simple FastAPI service that wraps an LLM API (Groq) into backend endpoints for AI applications.",
-    version="1.0.0"
+    title="GenAI LLM Gateway Backend",
+    description="A production-style FastAPI backend with a provider-agnostic LLM gateway supporting Groq, OpenAI, and Anthropic.",
+    version="1.1.0"
 )
 
 # ---- Root route ----
-# A quick sanity-check for students — just open http://localhost:8000/
 @app.get("/", tags=["Root"])
 def root():
     """Quick check that the server is alive."""
-    return {"message": "GenAI FastAPI Backend is running"}
-
+    return {
+        "message": "GenAI LLM Gateway Backend is running",
+        "status": "online",
+        "session": 4
+    }
 
 # ---- Register routers ----
 app.include_router(health.router, tags=["Health"])

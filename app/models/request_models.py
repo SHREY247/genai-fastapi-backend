@@ -13,6 +13,11 @@ from pydantic import BaseModel, Field
 class ChatRequest(BaseModel):
     """Body payload for the /ai/chat endpoint."""
 
+    provider: str = Field(
+        default="groq",
+        description="The LLM provider to use (groq, openai, anthropic).",
+        examples=["groq", "openai", "anthropic"],
+    )
     prompt: str = Field(
         ...,
         min_length=1,

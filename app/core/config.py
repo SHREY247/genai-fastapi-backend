@@ -14,11 +14,18 @@ from dotenv import load_dotenv
 # Load variables from the .env file into the environment
 load_dotenv()
 
-# ---- Groq / OpenAI-compatible settings ----
+# Project Settings
+PROJECT_NAME: str = "Applied GenAI Teaching Backend"
+API_V1_STR: str = "/api/v1"
 
+# ---- Groq Settings ----
 GROQ_API_KEY: str = os.getenv("GROQ_API_KEY", "")
-GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
-GROQ_BASE_URL: str = os.getenv(
-    "GROQ_BASE_URL",
-    "https://api.groq.com/openai/v1/chat/completions",
-)
+GROQ_MODEL: str = os.getenv("GROQ_MODEL", "llama-3.3-70b-versatile")
+
+# ---- OpenAI Settings ----
+OPENAI_API_KEY: str = os.getenv("OPENAI_API_KEY", "")
+OPENAI_MODEL: str = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
+
+# ---- Anthropic Settings ----
+ANTHROPIC_API_KEY: str = os.getenv("ANTHROPIC_API_KEY", "")
+ANTHROPIC_MODEL: str = os.getenv("ANTHROPIC_MODEL", "claude-3-5-sonnet-20240620")
