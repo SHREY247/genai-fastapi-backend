@@ -1,0 +1,158 @@
+ACME CORP — INFORMATION SECURITY GUIDELINES
+=============================================
+
+VERSION: 3.1 | EFFECTIVE DATE: March 1, 2025
+
+PURPOSE
+--------
+These guidelines establish the information security standards that all Acme Corp
+employees, contractors, and third-party users must follow. The objective is to
+protect company data, customer information, and IT infrastructure from
+unauthorized access, misuse, and cyber threats.
+
+SECTION 1: PASSWORD POLICY
+----------------------------
+1. Passwords must be at least 14 characters long.
+2. Passwords must include at least one uppercase letter, one lowercase letter,
+   one number, and one special character.
+3. Passwords must be changed every 90 days.
+4. The last 12 passwords cannot be reused.
+5. Passwords must not contain the user's name, username, or common dictionary
+   words.
+6. Default passwords on any system or device must be changed immediately upon
+   first login.
+7. Password managers are encouraged. The company provides a free license for
+   1Password to all employees.
+
+SECTION 2: MULTI-FACTOR AUTHENTICATION (MFA)
+----------------------------------------------
+1. MFA is mandatory for all company applications including email, VPN, cloud
+   services, and internal tools.
+2. Approved MFA methods include:
+   - Hardware security keys (YubiKey) — preferred
+   - Authenticator apps (Google Authenticator, Microsoft Authenticator)
+   - SMS-based OTP — allowed but discouraged due to SIM-swap risks
+3. Employees must register at least two MFA methods as backup.
+4. MFA enrollment must be completed within 24 hours of account creation.
+5. Exceptions require written approval from the CISO.
+
+SECTION 3: DEVICE SECURITY
+----------------------------
+1. All company-issued laptops must have full-disk encryption enabled (BitLocker
+   for Windows, FileVault for macOS).
+2. Automatic screen lock must be configured to activate after 5 minutes of
+   inactivity.
+3. Operating system and software updates must be installed within 72 hours of
+   release.
+4. Antivirus software must be installed and kept up to date on all endpoints.
+5. USB ports are disabled by default on company devices. Exceptions require IT
+   Security approval.
+6. Personal devices used for work (BYOD) must:
+   - Be registered with the IT department
+   - Have a mobile device management (MDM) agent installed
+   - Meet minimum OS version requirements
+   - Be remotely wipeable in case of loss or theft
+
+SECTION 4: NETWORK AND ACCESS CONTROL
+---------------------------------------
+1. Access to internal systems follows the principle of least privilege. Users
+   are granted only the permissions necessary for their role.
+2. Access reviews are conducted quarterly. Managers must certify that their
+   team members' access is still appropriate.
+3. VPN must be used when accessing company resources from outside the office
+   network.
+4. The company network is segmented into zones:
+   - Corporate zone: general employee access
+   - Development zone: restricted to engineering teams
+   - Production zone: restricted to authorized DevOps personnel
+   - Guest zone: isolated network for visitors, no access to internal resources
+5. All network traffic is monitored and logged for security analysis.
+6. Open Wi-Fi networks must not be used for any work-related activities without
+   an active VPN connection.
+
+SECTION 5: EMAIL AND COMMUNICATION SECURITY
+---------------------------------------------
+1. Employees must not open attachments or click links from unknown or suspicious
+   senders.
+2. Phishing simulation exercises are conducted monthly. Employees who fail two
+   consecutive simulations must complete additional security training.
+3. Sensitive data must not be sent via email without encryption. Use the
+   company-approved secure email gateway for classified communications.
+4. Auto-forwarding of company email to personal accounts is prohibited.
+5. All email is scanned for malware and data loss prevention (DLP) policy
+   violations.
+
+SECTION 6: DATA CLASSIFICATION AND HANDLING
+---------------------------------------------
+Data is classified into four categories:
+1. Public — information intended for public release (e.g., marketing materials)
+2. Internal — general business information not intended for external sharing
+3. Confidential — sensitive information such as financial data, employee records
+4. Restricted — highly sensitive data such as customer PII, trade secrets,
+   and source code
+
+Handling requirements by classification:
+- Public: no special restrictions
+- Internal: do not share externally without approval
+- Confidential: encrypt in transit and at rest, limit access to authorized
+  personnel
+- Restricted: encrypt everywhere, access only via approved secure systems,
+  log all access events, annual review required
+
+SECTION 7: INCIDENT RESPONSE
+------------------------------
+1. Any suspected security incident must be reported to the Security Operations
+   Center (SOC) immediately via security@acmecorp.com or phone extension 9111.
+2. Do not attempt to investigate or remediate incidents independently.
+3. Preserve all evidence — do not delete emails, logs, or files related to the
+   incident.
+4. The incident response team will:
+   a. Acknowledge the report within 30 minutes
+   b. Begin investigation within 1 hour
+   c. Provide status updates every 4 hours during active incidents
+   d. Conduct a post-incident review within 5 business days
+5. Critical incidents (data breaches involving customer PII) must be escalated
+   to the CISO and Legal team within 1 hour.
+
+SECTION 8: CLOUD SECURITY
+---------------------------
+1. Only approved cloud services may be used for storing company data.
+2. Approved services include: AWS, Azure, Google Cloud (for infrastructure),
+   Google Workspace, Microsoft 365 (for productivity).
+3. Shadow IT (unauthorized cloud services) is prohibited. The IT team conducts
+   regular audits to identify unauthorized services.
+4. Cloud storage must have:
+   - Encryption at rest and in transit
+   - Access controls aligned with the principle of least privilege
+   - Logging and monitoring enabled
+   - Regular backup and recovery testing
+
+SECTION 9: PHYSICAL SECURITY
+------------------------------
+1. Access badges must be worn visibly at all times on company premises.
+2. Tailgating (following someone through a secured door) is prohibited.
+3. Visitors must sign in at reception and be escorted by an employee at
+   all times.
+4. Sensitive documents must be stored in locked cabinets when not in use.
+5. Clean desk policy: all sensitive materials must be secured at the end
+   of each workday.
+6. Server rooms and data centers require separate key-card access limited
+   to authorized IT personnel.
+
+SECTION 10: COMPLIANCE AND TRAINING
+-------------------------------------
+1. All employees must complete annual security awareness training.
+2. New employees must complete security training within the first week.
+3. Specialized training is required for:
+   - Developers: secure coding practices (OWASP Top 10)
+   - Managers: access review and approval responsibilities
+   - IT staff: incident response and forensics procedures
+4. Compliance with these guidelines is audited annually by the internal audit
+   team and periodically by external assessors.
+5. Non-compliance may result in disciplinary action up to and including
+   termination.
+
+CONTACT
+--------
+Information Security Team: security@acmecorp.com | Extension 9111
+CISO Office: ciso-office@acmecorp.com | Extension 9000

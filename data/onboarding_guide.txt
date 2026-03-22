@@ -1,0 +1,142 @@
+ACME CORP — NEW EMPLOYEE ONBOARDING GUIDE
+==========================================
+
+Welcome to Acme Corp! This guide walks you through everything you need to
+complete during your first two weeks.
+
+PRE-DAY-ONE CHECKLIST
+----------------------
+Before your first day, please complete the following:
+1. Sign and return your offer letter and employment agreement via DocuSign.
+2. Complete the background check authorization form.
+3. Submit your banking details for direct deposit via the HR Portal.
+4. Review the Employee Handbook (sent to your personal email).
+5. Choose your laptop preference (MacBook Pro or Dell XPS) via the IT
+   Equipment Request form.
+
+DAY 1 — ORIENTATION
+---------------------
+Your first day begins at 10:00 AM. Here is your schedule:
+
+10:00 - 10:30  Welcome session with your HR Business Partner
+               - Overview of company culture and values
+               - Review of Code of Conduct
+               - Office tour (badge access, restrooms, pantry, emergency exits)
+
+10:30 - 11:00  IT Setup
+               - Receive your company laptop
+               - Set up your company email (yourname@acmecorp.com)
+               - Create your password (must meet the 14-character security policy)
+               - Enroll in Multi-Factor Authentication (MFA)
+               - Install required software: Slack, Zoom, 1Password, VPN client
+               - Connect to the corporate Wi-Fi network
+
+11:00 - 11:30  Access Provisioning
+               - Your manager will request access to relevant systems:
+                 * Jira for project tracking
+                 * Confluence for documentation
+                 * GitHub for source code (engineering roles)
+                 * Salesforce (sales and support roles)
+                 * Internal dashboards as needed
+               - Access is granted based on your role following the principle
+                 of least privilege
+
+11:30 - 12:00  Benefits Enrollment Overview
+               - HR will walk you through medical, dental, and vision plans
+               - 401(k) enrollment and employer match details
+               - Employee Stock Purchase Plan (ESPP) overview
+
+12:00 - 1:00   Team Lunch
+               - Your manager will organize a welcome lunch with the team
+
+1:00 - 2:00    Manager 1:1
+               - Introduction to team structure and current projects
+               - Discussion of your role, expectations, and 30-60-90 day plan
+               - Assignment of your onboarding buddy
+
+2:00 - 3:00    Mandatory Training — Session 1
+               - Information Security Awareness (online module, ~45 min)
+               - Quiz must be completed with a score of 80% or higher
+
+3:00 - 4:00    Workspace Setup
+               - Customize your desk/workspace
+               - Set up your development environment (engineering roles)
+               - Explore the internal knowledge base on Confluence
+               - Review your team's Slack channels and join relevant ones
+
+DAY 2 — DEEP DIVE
+-------------------
+9:00 - 10:00   Mandatory Training — Session 2
+               - Data Privacy and GDPR Compliance (online module, ~40 min)
+               - Anti-Harassment and Inclusion Training (~30 min)
+
+10:00 - 11:00  Product Overview
+               - Session with the Product Manager to understand our products
+               - Demo of the main customer-facing application
+               - Overview of the product roadmap
+
+11:00 - 12:00  Engineering Onboarding (Technical Roles)
+               - Repository walkthrough and branching strategy
+               - CI/CD pipeline overview
+               - Code review process and standards
+               - Local development environment verification
+
+12:00 - 1:00   Lunch
+
+1:00 - 2:30    Role-Specific Training
+               - Engineering: architecture deep-dive and coding standards
+               - Sales: CRM walkthrough and sales playbook review
+               - Support: ticketing system training and SLA guidelines
+               - Marketing: brand guidelines and content management system
+
+2:30 - 3:30    HR Policies Review
+               - Leave policy and PTO accrual
+               - Expense reimbursement process (submit via Expense Portal)
+               - Performance review cycle (June and December)
+               - The travel reimbursement policy can be found in the
+                 reimbursement policy document
+
+3:30 - 4:00    End-of-Day Check-in with Manager
+               - Questions and concerns
+               - Confirm Week 1 priorities
+
+DAYS 3-5 — INTEGRATION
+------------------------
+- Begin working on your first assigned task or project.
+- Shadow a team member on at least one customer call or sprint ceremony.
+- Complete any remaining mandatory training modules.
+- Schedule introductory 1:1 meetings with key stakeholders:
+  * Your skip-level manager
+  * Cross-functional partners
+  * Your onboarding buddy for weekly catch-ups
+- Read the team's documentation and recent project summaries.
+- Attend your first team standup and sprint planning meeting.
+
+WEEK 2 — GETTING PRODUCTIVE
+-----------------------------
+- Submit your first code review or deliverable (role-dependent).
+- Attend at least one company all-hands or brown-bag session.
+- Complete the "Acme Culture and Values" e-learning module.
+- Fill out the Week 1 onboarding feedback survey (sent via email).
+- Have your first formal 1:1 with your manager to discuss:
+  * Initial impressions and challenges
+  * Resource needs
+  * Adjusted 30-60-90 day goals
+
+IMPORTANT CONTACTS
+-------------------
+HR Business Partner: hr-support@acmecorp.com | Ext. 2000
+IT Help Desk: it-helpdesk@acmecorp.com | Ext. 3000
+Facilities: facilities@acmecorp.com | Ext. 5000
+Security Team: security@acmecorp.com | Ext. 9111
+Your Onboarding Buddy: assigned on Day 1
+
+TIPS FOR SUCCESS
+-----------------
+- Don't hesitate to ask questions — everyone was new once!
+- Keep a notebook for the first two weeks to capture key learnings.
+- Leverage your onboarding buddy for informal guidance.
+- Attend social events and team outings to build relationships.
+- Review the company wiki regularly as it is updated frequently.
+
+We're excited to have you on the team!

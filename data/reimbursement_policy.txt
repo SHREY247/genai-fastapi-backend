@@ -1,0 +1,100 @@
+ACME CORP — EMPLOYEE REIMBURSEMENT POLICY
+==========================================
+
+EFFECTIVE DATE: January 1, 2025
+
+OVERVIEW
+--------
+This document outlines the detailed reimbursement procedures for all employees
+of Acme Corp. All business-related expenses must be pre-approved and documented
+as described below. The goal of this policy is to ensure fair, transparent, and
+timely reimbursement while protecting the company from unnecessary costs.
+
+TRAVEL REIMBURSEMENT
+---------------------
+1. Airfare
+   - Economy class is the standard for domestic flights.
+   - Business class is allowed for international flights exceeding 6 hours
+     with prior VP-level approval.
+   - Tickets should be booked at least 14 days in advance when possible
+     to secure lower fares.
+   - Loyalty program benefits (miles, upgrades) accrued during business
+     travel belong to the employee.
+
+2. Hotel Accommodations
+   - Domestic hotel stays are reimbursed up to $200 per night.
+   - International hotel stays are reimbursed up to $300 per night.
+   - Employees must use preferred hotel partners when available.
+   - Extended stays exceeding 5 nights require finance team approval.
+   - Room service is covered only for meals, not for laundry or
+     entertainment items.
+
+3. Ground Transportation
+   - Ride-sharing services (Uber, Lyft) are preferred over rental cars
+     for short trips.
+   - Rental cars require manager approval and are limited to mid-size
+     or compact categories.
+   - Fuel for rental cars is reimbursable with receipts.
+   - Parking fees at airports and hotels are reimbursable.
+   - Toll charges incurred during business travel are reimbursable.
+
+MEAL REIMBURSEMENT
+-------------------
+- Daily meal limits:
+  - Domestic travel: $75 per day
+  - International travel: $100 per day
+- Meal limits cover breakfast, lunch, dinner, and reasonable snacks.
+- Alcoholic beverages are NOT reimbursable under any circumstances.
+- Tips up to 20% are included within the daily meal limit.
+- Client meals require pre-approval from the department head and must
+  include the client name, company, and business purpose on the receipt.
+
+EQUIPMENT AND SUPPLIES
+-----------------------
+- Employees may be reimbursed for work-related equipment purchased with
+  prior manager approval.
+- Approved items include:
+  - External monitors (up to $400)
+  - Keyboards, mice, and other peripherals (up to $150 total)
+  - Ergonomic chairs for home office (up to $500 with HR approval)
+  - Noise-canceling headphones (up to $250)
+- Software subscriptions must be approved by IT before purchase.
+- Personal phone and internet charges are reimbursable up to $75 per
+  month for employees who use personal devices for work.
+
+PROFESSIONAL DEVELOPMENT
+--------------------------
+- Conference registration fees are reimbursable with manager approval.
+- Travel to conferences follows the standard travel policy above.
+- Online course and certification fees are reimbursable up to $2,000 per
+  calendar year through the Learning & Development program.
+- Books and learning materials up to $200 per year do not require
+  pre-approval.
+
+SUBMISSION AND APPROVAL PROCESS
+---------------------------------
+1. All expense reports must be submitted within 30 days of the expense.
+2. Receipts are required for any single expense exceeding $25.
+3. Expense reports are submitted through the internal Expense Portal.
+4. Approvals follow this chain:
+   - Expenses under $500: direct manager approval
+   - Expenses $500-$2,000: manager + finance team approval
+   - Expenses over $2,000: manager + finance + VP approval
+5. Approved reimbursements are paid via direct deposit within 10 business
+   days of approval.
+6. Rejected claims will include a reason and may be resubmitted with
+   additional documentation.
+
+POLICY VIOLATIONS
+------------------
+- Submitting fraudulent or inflated expense reports is grounds for
+  immediate termination.
+- Repeated late submissions may result in delayed processing and
+  a formal warning.
+- Non-compliance with pre-approval requirements may result in denial
+  of the reimbursement claim.
+
+CONTACT
+--------
+For questions about this policy, contact the Finance Operations team at
+finance-ops@acmecorp.com or extension 4500.

@@ -1,0 +1,125 @@
+ACME CORP — HUMAN RESOURCES POLICY HANDBOOK (2025 EDITION)
+==========================================================
+
+SECTION 1: CODE OF CONDUCT
+---------------------------
+All employees of Acme Corp are expected to maintain the highest standards of
+professional and ethical conduct. This includes treating colleagues, customers,
+and partners with respect at all times. Discrimination, harassment, and
+retaliation of any kind are strictly prohibited. Violations will be
+investigated promptly and may result in disciplinary action up to and including
+termination of employment. Employees are encouraged to report concerns through
+the anonymous ethics hotline or directly to their HR Business Partner.
+
+SECTION 2: ATTENDANCE AND WORK HOURS
+-------------------------------------
+Standard working hours are 9:00 AM to 6:00 PM, Monday through Friday. Flexible
+work arrangements may be approved by the employee's direct manager and HR.
+Remote work is permitted up to three days per week for eligible roles as
+determined by departmental policy. Any changes to the agreed schedule must be
+communicated at least 48 hours in advance. Chronic absenteeism or tardiness will
+be addressed through a progressive disciplinary framework beginning with verbal
+counseling and escalating to written warnings and potential termination.
+
+SECTION 3: LEAVE POLICIES
+--------------------------
+Employees accrue 18 days of paid time off (PTO) per calendar year, prorated for
+mid-year joiners. In addition, the company observes 10 national holidays.
+Sick leave is available up to 12 days per year, with a doctor's note required
+for absences exceeding three consecutive days. Maternity leave is 26 weeks for
+birthing parents, and paternity leave is 2 weeks. Employees may also apply for
+unpaid leave of absence for personal reasons, subject to manager and HR approval.
+
+SECTION 4: PERFORMANCE MANAGEMENT
+-----------------------------------
+Performance reviews are conducted semi-annually. The first review takes place in
+June and the second in December. Reviews consist of a self-assessment, a manager
+assessment, and a peer-feedback component. Employees are rated on a 5-point scale
+from "Needs Improvement" to "Exceeds Expectations." Ratings directly influence
+annual bonus calculations and promotion eligibility. Goal-setting for the next
+review cycle must be completed within two weeks of each review. The company uses
+the OKR (Objectives and Key Results) framework for goal alignment.
+
+SECTION 5: COMPENSATION AND BENEFITS
+--------------------------------------
+Salaries are benchmarked against industry standards using annual compensation
+surveys. The company offers a comprehensive benefits package including medical,
+dental, and vision insurance for employees and dependents. A 401(k) retirement
+plan with a 4% employer match is available after 90 days of employment. Life
+insurance at 2x annual salary and long-term disability coverage are provided at
+no cost to the employee. Employees may also participate in the Employee Stock
+Purchase Plan (ESPP) at a 15% discount.
+
+SECTION 6: TRAVEL AND REIMBURSEMENT GUIDELINES
+------------------------------------------------
+Employees traveling on company business are eligible for reimbursement of
+reasonable expenses. Domestic travel requires pre-approval from the employee's
+manager. International travel requires additional approval from the department
+VP and the finance team.
+
+Reimbursable expenses include:
+- Economy-class airfare (business class permitted for flights over 6 hours with VP approval)
+- Hotel accommodations up to $200 per night domestically and $300 per night internationally
+- Meals up to $75 per day domestically, $100 per day internationally
+- Ground transportation including ride-sharing services
+- Internet and phone charges incurred during travel
+
+Non-reimbursable expenses include:
+- Alcoholic beverages
+- Personal entertainment
+- Upgrades without prior approval
+- Expenses incurred by non-employees (unless pre-approved client entertainment)
+
+All reimbursement claims must be submitted within 30 days of the trip via the
+internal expense management portal. Receipts are required for any single expense
+exceeding $25. Late submissions may be denied at the discretion of the finance
+team. Direct deposits for approved reimbursements are typically processed within
+10 business days.
+
+SECTION 7: WORKPLACE SAFETY
+-----------------------------
+Acme Corp is committed to maintaining a safe and healthy workplace. All
+employees must complete mandatory safety training within their first 30 days.
+Fire drills are conducted quarterly. Each floor has designated fire wardens
+responsible for guiding evacuation. First-aid kits are located near each
+pantry area. Any workplace injury, no matter how minor, must be reported to
+the facilities team and HR within 24 hours. The company maintains workers'
+compensation insurance for all employees.
+
+SECTION 8: ANTI-BRIBERY AND CORRUPTION
+----------------------------------------
+Employees must comply with all applicable anti-bribery and corruption laws,
+including the Foreign Corrupt Practices Act (FCPA) and the UK Bribery Act.
+Gifts to or from clients, vendors, or government officials must not exceed $100
+in value and must be disclosed via the compliance portal. Cash gifts of any
+amount are strictly prohibited. Employees who become aware of potential bribery
+or corruption must report immediately to the Legal and Compliance team.
+
+SECTION 9: DATA PRIVACY
+-------------------------
+Personal data of employees, customers, and partners must be handled in
+compliance with all applicable data protection regulations, including GDPR
+and CCPA. Access to personal data must be limited to those with a legitimate
+business need. Employees must complete annual data privacy training. Any
+suspected data breach must be reported to the Information Security team within
+one hour of discovery consistent with Section 10 of the security guidelines.
+
+SECTION 10: GRIEVANCE AND DISPUTE RESOLUTION
+----------------------------------------------
+Employees who have workplace grievances may initiate the resolution process by
+submitting a formal complaint to HR. The HR team will acknowledge receipt within
+two business days and aim to resolve the matter within 15 business days.
+Mediation services are available for disputes between employees. If the matter
+remains unresolved, it may be escalated to the VP of People Operations. The
+company prohibits any form of retaliation against employees who raise good-faith
+complaints.
+
+SECTION 11: TERMINATION AND OFFBOARDING
+-----------------------------------------
+Voluntary resignations require a minimum notice period of 30 days for individual
+contributors and 60 days for managers and above. The HR team will schedule an
+exit interview, and IT will coordinate the return of all company assets
+including laptops, access badges, and parking permits. Final paychecks
+including accrued but unused PTO will be issued within 15 days of the last
+working day. Non-compete and non-solicitation obligations continue for 12 months
+post-separation as outlined in the employment agreement.

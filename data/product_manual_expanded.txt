@@ -1,0 +1,225 @@
+ACME SMARTDEVICE X1 — PRODUCT MANUAL
+======================================
+
+VERSION: 2.0 | MODEL: SDX1-2025
+
+CHAPTER 1: INTRODUCTION
+-------------------------
+Congratulations on purchasing the Acme SmartDevice X1! This manual will help
+you set up, use, and maintain your device. The SmartDevice X1 is a
+next-generation IoT device designed for smart home automation, environmental
+monitoring, and voice-assisted control. It features a 5-inch HD touchscreen,
+dual-band Wi-Fi, Bluetooth 5.2, a built-in temperature and humidity sensor,
+and a far-field microphone array for voice commands.
+
+Package Contents:
+- 1x Acme SmartDevice X1
+- 1x USB-C power adapter (20W)
+- 1x Quick Start Guide
+- 1x Mounting bracket and screws
+- 1x Warranty card
+
+CHAPTER 2: INITIAL SETUP
+--------------------------
+Step 1: Unbox the device and connect the USB-C power adapter.
+Step 2: The device will power on automatically and display the welcome screen.
+Step 3: Select your preferred language from the list.
+Step 4: Connect to your Wi-Fi network:
+        - Tap Settings > Network > Wi-Fi
+        - Select your network and enter the password
+        - The device will confirm connection with a green checkmark
+Step 5: Create your Acme Account or sign in:
+        - Download the Acme Home app on your phone (iOS/Android)
+        - Open the app, tap "Add Device," and follow the pairing instructions
+        - The app will discover the SmartDevice X1 via Bluetooth
+Step 6: Complete the firmware update when prompted. This may take 5-10 minutes.
+Step 7: Customize your home screen by adding widgets for weather, calendar,
+        reminders, and smart home controls.
+
+CHAPTER 3: FEATURES AND USAGE
+-------------------------------
+3.1 Voice Assistant
+The SmartDevice X1 includes a built-in voice assistant. Activate it by saying
+"Hey Acme" followed by your command. Supported commands include:
+- "Hey Acme, what's the weather today?"
+- "Hey Acme, set a timer for 10 minutes."
+- "Hey Acme, turn off the living room lights."
+- "Hey Acme, play my morning playlist."
+The voice assistant supports English, Spanish, French, and German.
+
+3.2 Smart Home Integration
+The device is compatible with major smart home ecosystems:
+- Acme Home ecosystem (native)
+- Google Home
+- Amazon Alexa
+- Apple HomeKit (via bridge)
+To connect smart devices, navigate to Settings > Smart Home > Add Device.
+
+3.3 Environmental Monitoring
+The built-in sensors measure:
+- Temperature (range: -10C to 50C, accuracy: +/- 0.5C)
+- Humidity (range: 10% to 90%, accuracy: +/- 3%)
+- Air Quality Index (using the optional AQ sensor dongle, sold separately)
+Readings are displayed on the home screen and logged hourly in the Acme Home
+app for trend analysis.
+
+3.4 Display and Widgets
+The 5-inch IPS display runs at 1280x720 resolution. You can customize the
+home screen with up to 8 widgets:
+- Clock (analog or digital)
+- Weather
+- Calendar (syncs with Google Calendar and Outlook)
+- Photo frame (displays photos from your Acme Cloud album)
+- Smart home controls
+- Reminders and to-do lists
+
+3.5 Media Playback
+The device has a built-in 10W speaker with passive bass radiator. It supports:
+- Streaming from Spotify, Apple Music, and Acme Music
+- Bluetooth audio from your phone or tablet
+- Podcast playback via the Acme Podcasts app
+- Multi-room audio when paired with other Acme speakers
+
+CHAPTER 4: TROUBLESHOOTING
+----------------------------
+This section covers common issues and their solutions.
+
+4.1 Device Not Powering On
+- Ensure the USB-C cable is firmly connected to both the device and the
+  power adapter.
+- Try a different power outlet.
+- Use only the included 20W power adapter. Third-party adapters below 15W
+  may not provide sufficient power.
+- If the device still does not power on, perform a hardware reset by
+  inserting a paperclip into the reset pinhole on the back of the device
+  and holding for 10 seconds.
+
+4.2 Wi-Fi Connectivity Issues
+- Ensure your router is broadcasting on 2.4 GHz or 5 GHz (the device
+  supports both).
+- Move the device closer to your router to improve signal strength.
+- Restart your router and the SmartDevice X1.
+- Forget the network in Settings > Network > Wi-Fi > Saved Networks, then
+  reconnect.
+- If using a mesh network, ensure all nodes are updated to the latest
+  firmware.
+
+4.3 Overheating
+The SmartDevice X1 is designed to operate in ambient temperatures between
+10C and 35C. If the device overheats:
+- The screen will display a thermal warning icon (thermometer with
+  exclamation mark).
+- The device will automatically reduce screen brightness and disable
+  intensive background processes.
+- Move the device away from direct sunlight, heat sources, or enclosed
+  spaces with poor ventilation.
+- Ensure the ventilation grilles on the back of the device are not blocked.
+- Remove any cases or covers that may trap heat.
+- If the device does not cool down within 15 minutes, disconnect the
+  power adapter and let it rest for 30 minutes.
+- If overheating persists after following all steps, contact Acme Support
+  as a hardware defect may be present.
+- Note: Operating the device while charging and streaming simultaneously
+  in high ambient temperatures may trigger thermal throttling.
+
+4.4 Battery and Power Issues
+The SmartDevice X1 contains a 4000 mAh backup battery for power outage
+continuity.
+- Battery life in backup mode: approximately 3 hours with display on,
+  6 hours with display off.
+- To check battery health: Settings > System > Battery > Health Report.
+- If the battery drains unusually fast:
+  * Reduce screen brightness
+  * Disable unused features (Bluetooth, voice assistant)
+  * Check for background apps consuming power in Settings > Apps > Battery
+    Usage
+  * Perform a firmware update, as battery optimization fixes are included
+    in recent releases
+- The battery is not user-replaceable. If the battery holds less than 50%
+  of its original capacity, contact Acme Support for a battery replacement
+  service ($49 fee outside warranty).
+- Do NOT attempt to open the device casing. Doing so will void the warranty.
+
+4.5 Factory Reset
+If you need to erase all data and return the device to factory settings:
+- Method 1 (Software): Settings > System > Reset > Factory Reset > Confirm
+- Method 2 (Hardware): Power off the device. Hold the Volume Down + Power
+  buttons simultaneously for 15 seconds until the Acme logo appears.
+  Select "Factory Reset" from the recovery menu using the volume buttons
+  and confirm with the power button.
+WARNING: A factory reset will delete all personal data, accounts, smart
+home configurations, and custom settings. This action cannot be undone.
+Back up your data via the Acme Home app before proceeding.
+
+4.6 Voice Assistant Not Responding
+- Ensure the microphone is not muted (check the physical mute switch on
+  the top of the device).
+- Check that voice assistant is enabled: Settings > Voice > Assistant > On.
+- Verify the device has an active internet connection.
+- Retrain the voice model: Settings > Voice > Retrain Voice > follow prompts.
+- If the issue persists, perform a software reset: Settings > System >
+  Restart.
+
+CHAPTER 5: MAINTENANCE AND CARE
+---------------------------------
+5.1 Cleaning
+- Use a soft, lint-free microfiber cloth to clean the screen.
+- Do not use chemicals, abrasive cleaners, or solvents.
+- The ventilation grilles can be cleaned with compressed air every 3 months
+  to prevent dust buildup.
+
+5.2 Firmware Updates
+- The device checks for firmware updates automatically once per week.
+- Manual check: Settings > System > Firmware > Check for Updates.
+- Updates are downloaded in the background and installed during idle periods
+  or at the scheduled update time (default: 3:00 AM).
+- Major updates may require a device restart. A notification will appear
+  24 hours before the scheduled restart.
+- Do not disconnect power during a firmware update.
+
+5.3 Storage Management
+- The device has 16 GB of internal storage.
+- To check available storage: Settings > System > Storage.
+- Free up space by deleting unused apps, clearing cache, and transferring
+  photos to Acme Cloud.
+- The device does not support external storage (SD card).
+
+5.4 Yearly Maintenance Checklist
+- Replace the USB-C cable if frayed or damaged.
+- Clean ventilation grilles.
+- Review and remove unused smart home device pairings.
+- Update the emergency contact information in the Acme Home app.
+- Run a battery health check and consider replacement if below 50%.
+
+CHAPTER 6: WARRANTY AND SUPPORT
+---------------------------------
+The Acme SmartDevice X1 comes with a 2-year limited warranty covering
+manufacturing defects. The warranty does not cover:
+- Damage from drops, water, or misuse
+- Unauthorized modifications or repairs
+- Normal wear and tear (including battery degradation)
+
+For support:
+- Email: support@acmecorp.com
+- Phone: 1-800-ACME-HELP (1-800-226-3435)
+- Hours: Monday-Friday, 8:00 AM - 8:00 PM EST
+- Online: support.acmecorp.com/smartdevice-x1
+
+Extended warranty plans are available for purchase within 30 days of the
+original purchase date.
+
+CHAPTER 7: SPECIFICATIONS
+---------------------------
+Display:       5-inch IPS, 1280x720, 350 nits brightness
+Processor:     Quad-core ARM Cortex-A55, 1.8 GHz
+Memory:        2 GB RAM
+Storage:       16 GB eMMC
+Connectivity:  Wi-Fi 6 (802.11ax), Bluetooth 5.2
+Sensors:       Temperature, Humidity, Ambient Light
+Audio:         10W speaker, dual far-field microphones
+Battery:       4000 mAh Li-ion (backup)
+Power:         USB-C, 20W adapter included
+Dimensions:    180 x 120 x 25 mm
+Weight:        320 g
+Operating Temp: 10C to 35C
+Colors:        Midnight Black, Arctic White, Ocean Blue
