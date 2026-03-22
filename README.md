@@ -140,6 +140,20 @@ You're ready — jump to **How to Run** below.
 
 ---
 
+## What This Demo Proves
+
+This session demonstrates three facts through live code:
+
+| Fact | What You'll See |
+|------|-----------------|
+| Full-document retrieval fails | Top results have low, noisy scores. Rank 2–3 are completely unrelated documents. |
+| Chunking fixes retrieval | Same query returns higher scores. All top-3 results come from the correct source. |
+| Better retrieval = better answers | The LLM answer is grounded, specific, and accurate — not hallucinated. |
+
+The **same query** is used in whole-doc mode and chunked mode back-to-back. The improvement is not theoretical. You will see the numbers change in the terminal.
+
+---
+
 ## How to Run
 
 ### 1. Activate Environment
@@ -195,15 +209,21 @@ This demonstrates:
 
 Run these in order during the live demo. Each command is self-contained and can be copy-pasted directly into the terminal.
 
-### Step 1 — Show what data we have
+---
+
+### Step 1 — Inspect the data folder
+**Goal**: Confirm the 5 source documents are present before anything runs.
 
 ```bash
 ls -la data/
 ```
 
+**Expected**: 5 `.txt` files — HR policy, onboarding guide, product manual, reimbursement policy, security guidelines.
+
 ---
 
 ### Step 2 — Ingest the documents
+**Goal**: Show that loading is transparent — you see exactly what goes in.
 
 ```bash
 python -c "
@@ -214,9 +234,12 @@ for d in docs:
 "
 ```
 
+**Expected**: 5 documents loaded, sizes ranging from ~4,000 to ~9,600 characters. Notice `hr_policy_expanded.txt` is large — reimbursement information is buried inside it.
+
 ---
 
 ### Step 3 — Compare whole-doc vs chunked record counts
+**Goal**: Make the scale difference concrete before retrieval.
 
 ```bash
 python -c "
@@ -230,9 +253,18 @@ print('Chunked records  :', len(chunks))
 "
 ```
 
+**Expected**:
+```
+Whole-doc records: 5
+Chunked records  : 31
+```
+
+When we retrieve top-3 in whole-doc mode, we retrieve 60% of the entire corpus. With chunks, we retrieve 3 focused paragraphs. That precision gap is what this session is about.
+
 ---
 
 ### Step 4 — Show what an embedding looks like
+**Goal**: Demystify vectors — text becomes a list of 384 numbers.
 
 ```bash
 python -c "
@@ -244,9 +276,18 @@ print('First 5 values  :', v[0][:5].tolist())
 "
 ```
 
+**Expected**:
+```
+Vector dimension: 384
+First 5 values  : [0.026..., 0.063..., -0.020..., 0.013..., -0.029...]
+```
+
+The exact values don't matter. What matters: 384 numbers capture the *meaning* of the query. "Hotel limit" and "maximum accommodation rate" will produce nearby vectors even though they share no words.
+
 ---
 
-### Step 5 — Key comparison: whole-doc vs chunked retrieval ⬅ highlight of the demo
+### Step 5 — THE PROOF: Why Chunking Wins
+**Goal**: Show side-by-side that chunking produces higher scores and eliminates noise.
 
 ```bash
 python -c "
@@ -275,19 +316,39 @@ for r in Retriever(embedder, cs).retrieve(query, k=3):
 "
 ```
 
-> Observe: Whole-doc Rank 2–3 are noise (HR handbook, security doc). Chunked Rank 1–3 all come from `reimbursement_policy.txt`.
+**Expected**:
+```
+=== WHOLE DOC ===
+  0.5042  reimbursement_policy.txt                  doc-3
+  0.1684  hr_policy_expanded.txt                    doc-0     ← noise
+  0.1548  security_guidelines.txt                   doc-4     ← noise
+
+=== CHUNKED ===
+  0.5476  reimbursement_policy.txt                  chunk-1   ← relevant
+  0.5042  reimbursement_policy.txt                  chunk-0   ← relevant
+  0.4598  reimbursement_policy.txt                  chunk-2   ← relevant
+```
+
+**Observe**:
+- Whole-doc: Rank 1 is correct but Rank 2–3 are completely wrong — the LLM would receive irrelevant context.
+- Chunked: All 3 results come from the correct file. Scores are tighter and higher. The LLM receives focused, accurate context.
+- This is why RAG without chunking often underperforms naive expectations.
 
 ---
 
 ### Step 6 — Full pipeline with grounded LLM answers
+**Goal**: Show the end-to-end system: retrieval feeds the LLM and produces a grounded answer.
 
 ```bash
 python -m app.rag.playground
 ```
 
+**Expected**: Three queries answered with retrieved chunks printed before each answer. The LLM does not hallucinate — it quotes directly from the retrieved content.
+
 ---
 
-### Step 7 — Bonus: try any question interactively
+### Step 7 — Bonus: answer any live audience question
+**Goal**: Let the audience ask anything and show retrieval + answer in real time.
 
 ```bash
 python -c "
@@ -302,3 +363,17 @@ for r in results:
 ```
 
 Replace `YOUR QUESTION HERE` with anything the audience asks.
+
+---
+
+## Common Issues During Demo
+
+| Issue | Cause | Fix |
+|-------|-------|-----|
+| `ModuleNotFoundError: faiss` | `faiss-cpu` not installed | `pip install faiss-cpu` |
+| `ModuleNotFoundError: sentence_transformers` | Missing dependency | `pip install sentence-transformers` |
+| `GROQ_API_KEY is not configured` | `.env` not set up | `cp .env.example .env` then add key |
+| Low similarity scores across all results | Query too vague or no matching content | Try a more specific query; check `data/` files |
+| All top-3 results from wrong file | Chunking not enabled | Confirm `use_chunking=True` in pipeline |
+| `FileNotFoundError: data/` | Running from wrong directory | Run all commands from repo root |
+| Model download hangs | Slow network / HF Hub rate limit | Pre-download before class: run Step 4 once; model caches in `~/.cache/huggingface/` |
