@@ -188,3 +188,117 @@ This demonstrates:
   "prompt": "Explain vector databases in simple terms."
 }
 ```
+
+---
+
+## Session 7 — Step-by-Step Demo Commands
+
+Run these in order during the live demo. Each command is self-contained and can be copy-pasted directly into the terminal.
+
+### Step 1 — Show what data we have
+
+```bash
+ls -la data/
+```
+
+---
+
+### Step 2 — Ingest the documents
+
+```bash
+python -c "
+from app.rag.ingestion import load_documents
+docs = load_documents('data')
+for d in docs:
+    print(f'{d[\"source\"]:45s} {len(d[\"text\"]):>5} chars')
+"
+```
+
+---
+
+### Step 3 — Compare whole-doc vs chunked record counts
+
+```bash
+python -c "
+from app.rag.ingestion import load_documents
+from app.rag.chunking import build_whole_document_records, build_chunks
+docs = load_documents('data')
+whole = build_whole_document_records(docs)
+chunks = build_chunks(docs, chunk_size=200, overlap=30)
+print('Whole-doc records:', len(whole))
+print('Chunked records  :', len(chunks))
+"
+```
+
+---
+
+### Step 4 — Show what an embedding looks like
+
+```bash
+python -c "
+from app.rag.embedding import HuggingFaceEmbedder
+e = HuggingFaceEmbedder()
+v = e.embed_query('hotel reimbursement limit')
+print('Vector dimension:', len(v[0]))
+print('First 5 values  :', v[0][:5].tolist())
+"
+```
+
+---
+
+### Step 5 — Key comparison: whole-doc vs chunked retrieval ⬅ highlight of the demo
+
+```bash
+python -c "
+from app.rag.ingestion import load_documents
+from app.rag.chunking import build_whole_document_records, build_chunks
+from app.rag.embedding import HuggingFaceEmbedder
+from app.rag.vector_store import FAISSVectorStore
+from app.rag.retriever import Retriever
+
+query = 'What is the maximum hotel reimbursement per night for domestic travel?'
+embedder = HuggingFaceEmbedder()
+docs = load_documents('data')
+
+wr = build_whole_document_records(docs)
+ws = FAISSVectorStore.from_embeddings(wr, embedder.embed_documents([r['text'] for r in wr]))
+print('=== WHOLE DOC ===')
+for r in Retriever(embedder, ws).retrieve(query, k=3):
+    print(f'  {r[\"score\"]:.4f}  {r[\"source\"]:40s}  {r[\"chunk_id\"]}')
+
+cr = build_chunks(docs, chunk_size=200, overlap=30)
+cs = FAISSVectorStore.from_embeddings(cr, embedder.embed_documents([r['text'] for r in cr]))
+print()
+print('=== CHUNKED ===')
+for r in Retriever(embedder, cs).retrieve(query, k=3):
+    print(f'  {r[\"score\"]:.4f}  {r[\"source\"]:40s}  {r[\"chunk_id\"]}')
+"
+```
+
+> Observe: Whole-doc Rank 2–3 are noise (HR handbook, security doc). Chunked Rank 1–3 all come from `reimbursement_policy.txt`.
+
+---
+
+### Step 6 — Full pipeline with grounded LLM answers
+
+```bash
+python -m app.rag.playground
+```
+
+---
+
+### Step 7 — Bonus: try any question interactively
+
+```bash
+python -c "
+from app.rag.pipeline import RAGPipeline
+p = RAGPipeline(provider='groq', data_dir='data', use_chunking=True)
+results = p.inspect_retrieval('YOUR QUESTION HERE')
+for r in results:
+    print(r['source'], r['chunk_id'], round(r['score'], 4))
+    print(r['text'][:200])
+    print()
+"
+```
+
+Replace `YOUR QUESTION HERE` with anything the audience asks.
