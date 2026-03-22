@@ -99,17 +99,54 @@ ANTHROPIC_API_KEY=sk-ant-...
 
 ---
 
-## How to Run
+## Getting Started (Students)
 
-### 1. Setup
+If you already have the repo cloned, fetch and switch to the Session 7 branch:
 
 ```bash
+git fetch origin
+git checkout feature/session-7-rag-foundations
+```
+
+If you don't have the repo yet:
+
+```bash
+git clone https://github.com/SHREY247/genai-fastapi-backend.git
+cd genai-fastapi-backend
+git checkout feature/session-7-rag-foundations
+```
+
+Then set up your environment:
+
+```bash
+python -m venv venv
+
 # Activate virtual environment
 source venv/bin/activate        # macOS/Linux
 venv\Scripts\activate           # Windows
 
-# Install dependencies
+# Install all dependencies
 pip install -r requirements.txt
+```
+
+Copy the environment file and add your API key(s):
+
+```bash
+cp .env.example .env
+# Edit .env and fill in at least one provider key (e.g. GROQ_API_KEY)
+```
+
+You're ready — jump to **How to Run** below.
+
+---
+
+## How to Run
+
+### 1. Activate Environment
+
+```bash
+source venv/bin/activate        # macOS/Linux
+venv\Scripts\activate           # Windows
 ```
 
 ### 2. Run the FastAPI Server (Session 4)
