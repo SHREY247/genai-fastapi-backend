@@ -1,6 +1,20 @@
-# GenAI FastAPI Backend
+# GenAI FastAPI Backend — Session 7: RAG Foundations
 
-A **minimal, production-style** FastAPI backend built as a teaching scaffold for the **Applied Generative AI Engineering** course.
+A **minimal, modular** FastAPI backend for the **Applied Generative AI Engineering** course.
+
+---
+
+## System Framing — Read This First
+
+This is **not** an LLM application with some retrieval bolted on.
+
+This is a **retrieval system** with an LLM at the end.
+
+The LLM is the last 5% of the pipeline. The other 95% — ingestion, chunking, embedding, indexing, retrieval — determines whether the LLM produces a useful answer or a hallucinated one.
+
+**Core principle**: The quality of your retrieval defines the ceiling of your generation. A perfect LLM cannot fix bad retrieval. A mediocre LLM with excellent retrieval will outperform a frontier model with poor retrieval.
+
+This session teaches you to build and reason about that retrieval system.
 
 ---
 
@@ -13,9 +27,35 @@ A **minimal, production-style** FastAPI backend built as a teaching scaffold for
 
 ---
 
+## Two Pipelines: Offline and Online
+
+Every RAG system has two distinct execution paths. Understanding this separation is fundamental to system design.
+
+### Offline Pipeline (Indexing)
+
+Runs **once** (or on document update). Not latency-sensitive.
+
+```
+data/*.txt → ingestion → chunking → embedding → FAISS index
+```
+
+This is a **batch job**. You pay the cost of embedding all documents upfront. The result is a searchable vector index stored in memory.
+
+### Online Pipeline (Query)
+
+Runs **per user query**. Latency-sensitive.
+
+```
+query → embed query → FAISS search → build prompt → LLM → answer
+```
+
+Only **one** embedding call (the query) and one LLM call per request. The FAISS search itself is sub-millisecond. This is why RAG scales — the expensive work is done offline.
+
+---
+
 ## What's New in Session 7
 
-Session 7 adds a **standalone RAG (Retrieval-Augmented Generation) module** on top of the Session 4 gateway.
+Session 7 adds a **standalone RAG module** on top of the Session 4 gateway.
 
 - **Document Ingestion**: Load `.txt` files from the `data/` folder
 - **Chunking**: Compare whole-document retrieval vs chunked retrieval
@@ -140,20 +180,6 @@ You're ready — jump to **How to Run** below.
 
 ---
 
-## What This Demo Proves
-
-This session demonstrates three facts through live code:
-
-| Fact | What You'll See |
-|------|-----------------|
-| Full-document retrieval fails | Top results have low, noisy scores. Rank 2–3 are completely unrelated documents. |
-| Chunking fixes retrieval | Same query returns higher scores. All top-3 results come from the correct source. |
-| Better retrieval = better answers | The LLM answer is grounded, specific, and accurate — not hallucinated. |
-
-The **same query** is used in whole-doc mode and chunked mode back-to-back. The improvement is not theoretical. You will see the numbers change in the terminal.
-
----
-
 ## How to Run
 
 ### 1. Activate Environment
@@ -211,8 +237,8 @@ Run these in order during the live demo. Each command is self-contained and can 
 
 ---
 
-### Step 1 — Inspect the data folder
-**Goal**: Confirm the 5 source documents are present before anything runs.
+### Step 1 — Inspect the raw data
+**Goal**: Know your corpus before building anything.
 
 ```bash
 ls -la data/
@@ -223,7 +249,7 @@ ls -la data/
 ---
 
 ### Step 2 — Ingest the documents
-**Goal**: Show that loading is transparent — you see exactly what goes in.
+**Goal**: Verify the ingestion layer is transparent — you see exactly what enters the system.
 
 ```bash
 python -c "
@@ -234,12 +260,12 @@ for d in docs:
 "
 ```
 
-**Expected**: 5 documents loaded, sizes ranging from ~4,000 to ~9,600 characters. Notice `hr_policy_expanded.txt` is large — reimbursement information is buried inside it.
+**Expected**: 5 documents loaded, sizes ranging from ~4,000 to ~9,600 characters. Notice `hr_policy_expanded.txt` is large — reimbursement information is buried deep inside broader policy text. This is by design.
 
 ---
 
-### Step 3 — Compare whole-doc vs chunked record counts
-**Goal**: Make the scale difference concrete before retrieval.
+### Step 3 — Chunking: see the retrieval resolution change
+**Goal**: Understand that chunking defines the granularity of what can be retrieved.
 
 ```bash
 python -c "
@@ -259,12 +285,18 @@ Whole-doc records: 5
 Chunked records  : 31
 ```
 
-When we retrieve top-3 in whole-doc mode, we retrieve 60% of the entire corpus. With chunks, we retrieve 3 focused paragraphs. That precision gap is what this session is about.
+**Why this matters**: Chunking is the **single most important design decision** in a RAG system. It defines your retrieval resolution — the smallest unit that can be independently retrieved.
+
+- **Too large** (whole-doc): retrieval returns everything, diluting relevance. Top-3 from 5 docs = 60% of corpus. That's not retrieval, that's a dump.
+- **Too small** (10 words): individual chunks lose context, meaning is fragmented.
+- **Right-sized** (~150–300 words with overlap): each chunk is a self-contained semantic unit. Top-3 from 31 chunks = focused, relevant context.
+
+The overlap prevents information loss at chunk boundaries. A sentence split between two chunks is captured in both.
 
 ---
 
-### Step 4 — Show what an embedding looks like
-**Goal**: Demystify vectors — text becomes a list of 384 numbers.
+### Step 4 — Understand embeddings: text as vectors
+**Goal**: See that text is projected into a 384-dimensional vector space where *meaning* defines proximity.
 
 ```bash
 python -c "
@@ -282,12 +314,21 @@ Vector dimension: 384
 First 5 values  : [0.026..., 0.063..., -0.020..., 0.013..., -0.029...]
 ```
 
-The exact values don't matter. What matters: 384 numbers capture the *meaning* of the query. "Hotel limit" and "maximum accommodation rate" will produce nearby vectors even though they share no words.
+The exact values are irrelevant. What matters is the property these vectors have: `"hotel reimbursement limit"` and `"maximum accommodation rate per night"` will produce **nearby vectors** even though they share **zero words**. This is semantic similarity — the foundation of dense retrieval and the reason we use embeddings instead of keyword search.
+
+The model (`all-MiniLM-L6-v2`) is a 22M-parameter transformer trained on millions of text pairs. It runs locally on CPU in milliseconds. No API key, no network call.
 
 ---
 
 ### Step 5 — THE PROOF: Why Chunking Wins
-**Goal**: Show side-by-side that chunking produces higher scores and eliminates noise.
+
+**Before you run this, predict the failure.**
+
+Think about it: if you embed a 7,000-character HR policy document as a single vector, that vector represents *everything* — leave policies, performance reviews, reimbursement rules, and termination procedures all compressed into 384 numbers. When you search for "hotel reimbursement," the vector has to simultaneously represent all those topics. It will be a mediocre match for everything and an excellent match for nothing.
+
+Now predict: will chunking fix this?
+
+**Goal**: Confirm the prediction with real numbers.
 
 ```bash
 python -c "
@@ -329,26 +370,42 @@ for r in Retriever(embedder, cs).retrieve(query, k=3):
   0.4598  reimbursement_policy.txt                  chunk-2   ← relevant
 ```
 
-**Observe**:
-- Whole-doc: Rank 1 is correct but Rank 2–3 are completely wrong — the LLM would receive irrelevant context.
-- Chunked: All 3 results come from the correct file. Scores are tighter and higher. The LLM receives focused, accurate context.
-- This is why RAG without chunking often underperforms naive expectations.
+**Analysis**:
+- Whole-doc Rank 1 is correct, but Rank 2–3 are irrelevant. The LLM would receive security guidelines and HR code-of-conduct alongside reimbursement rules — guaranteed confusion.
+- Chunked: all 3 results come from the correct file. Scores are tighter and higher. The LLM receives 3 focused paragraphs that directly answer the question.
+
+**Why top-3 instead of top-1?** Retrieving a single result is brittle — the answer might span two chunks, or the best chunk might rank second due to embedding noise. Top-3 increases recall while keeping context small. This is a precision-recall tradeoff: too few results and you miss information, too many and you dilute the context. For this corpus and chunk size, `k=3` is the right balance.
 
 ---
 
-### Step 6 — Full pipeline with grounded LLM answers
-**Goal**: Show the end-to-end system: retrieval feeds the LLM and produces a grounded answer.
+### Retrieval Inspection Discipline
+
+**Rule**: Never pass retrieval output blindly to the LLM.
+
+Before every LLM call, inspect:
+1. **Scores** — are they above a meaningful threshold? Scores below 0.3 are likely noise.
+2. **Sources** — do the results come from the expected file(s)?
+3. **Content** — does the preview text actually contain the answer?
+
+Use `pipeline.inspect_retrieval(query)` to retrieve without calling the LLM. This is your debugging tool. If retrieval is wrong, the LLM answer *will* be wrong — no amount of prompt engineering will fix bad context.
+
+---
+
+### Step 6 — End-to-end: grounded LLM answers
+**Goal**: Observe the full system — retrieval feeds the LLM, grounding prevents hallucination.
 
 ```bash
 python -m app.rag.playground
 ```
 
-**Expected**: Three queries answered with retrieved chunks printed before each answer. The LLM does not hallucinate — it quotes directly from the retrieved content.
+**Expected**: Three queries answered with retrieved chunks printed before each answer. The LLM does not hallucinate — it quotes directly from retrieved content.
+
+**Why grounded prompting works**: The prompt instructs the LLM to answer *only* from the provided context and to say "I don't know based on the provided documents" when the answer isn't present. This is not politeness — it's a hard constraint that exploits how attention mechanisms work. When context is placed before the question, the model attends to it preferentially. The explicit refusal instruction prevents the model from falling back to parametric memory when the context is insufficient.
 
 ---
 
 ### Step 7 — Bonus: answer any live audience question
-**Goal**: Let the audience ask anything and show retrieval + answer in real time.
+**Goal**: Let the audience test the system with arbitrary queries.
 
 ```bash
 python -c "
@@ -366,6 +423,23 @@ Replace `YOUR QUESTION HERE` with anything the audience asks.
 
 ---
 
+## This Is Not Production
+
+This system is designed for learning, not deployment. Know the gaps:
+
+| Limitation | What production systems add |
+|---|---|
+| **No persistence** | Index is rebuilt from scratch on every run. Production uses persistent vector databases (Pinecone, Weaviate, pgvector). |
+| **No re-ranking** | Results go directly from FAISS to the LLM. Production adds a cross-encoder re-ranker to refine relevance after retrieval. |
+| **No hybrid search** | We use dense retrieval only. Production combines dense (semantic) + sparse (BM25/keyword) for robustness. |
+| **No evaluation** | We eyeball results. Production measures recall@k, MRR, and answer faithfulness systematically. |
+| **No streaming** | The LLM call blocks until complete. Production streams tokens for perceived latency reduction. |
+| **Fixed chunk size** | One size for all documents. Production tunes per document type or uses semantic chunking. |
+
+These are future sessions. Today's goal is to internalize the retrieval fundamentals that every production system builds on.
+
+---
+
 ## Common Issues During Demo
 
 | Issue | Cause | Fix |
@@ -377,3 +451,11 @@ Replace `YOUR QUESTION HERE` with anything the audience asks.
 | All top-3 results from wrong file | Chunking not enabled | Confirm `use_chunking=True` in pipeline |
 | `FileNotFoundError: data/` | Running from wrong directory | Run all commands from repo root |
 | Model download hangs | Slow network / HF Hub rate limit | Pre-download before class: run Step 4 once; model caches in `~/.cache/huggingface/` |
+
+---
+
+## Core Insight
+
+> **RAG is a retrieval problem disguised as a generation problem.**
+>
+> Most teams debug the LLM when the answer is wrong. The fix is almost always in the retrieval layer — better chunking, better embeddings, better scoring. Fix retrieval first. The generation will follow.
