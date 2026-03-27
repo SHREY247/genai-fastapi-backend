@@ -1,60 +1,63 @@
 """
 rag/session9_playground.py
 ---------------------------
-Session 9: Advanced RAG Frameworks — Master Interactive Demo
+Session 9: Advanced RAG Frameworks — Framework Comparison Demo
 
 Run from repo root:
     python -m app.rag.session9_playground
 
-What this demonstrates (5 steps):
-    STEP 1 - Query rewriting: vague query vs rewritten query, better retrieval
-    STEP 2 - Dense vs keyword: same query, different top results
-    STEP 3 - LlamaIndex pipeline: full RAG answer with framework abstraction
-    STEP 4 - LangChain pipeline: full RAG answer with chain composition
-    STEP 5 - Full 4-way comparison on a conflict-resolution query
+What this demonstrates (4 steps):
 
-Teaching flow:
-    This playground is designed to be run section-by-section in class,
-    not all at once. Each STEP takes 2-5 minutes of discussion.
-    Use Ctrl+C to pause between steps if needed.
+    STEP 1 — Session 8 manual pipeline recap
+              Remind students what we built by hand: 8 modules, full control
 
-Frameworks used (must be installed):
-    pip install rank-bm25 llama-index-core llama-index-embeddings-huggingface
+    STEP 2 — LlamaIndex pipeline
+              Same data, 30 lines of setup, index-centric abstraction
+
+    STEP 3 — LangChain pipeline
+              Same data, chain-centric abstraction, different composition model
+
+    STEP 4 — Framework comparison
+              Code size, abstraction level, control, source visibility
+
+Teaching intent:
+    Session 9 is about seeing the RAG design space expand.
+    After building everything manually in Sessions 7–8, students now see how
+    frameworks compress that work — and what they give up in exchange.
+
+    This session does NOT cover:
+        - BM25 / keyword retrieval     → Session 10
+        - Query rewriting              → Session 10
+        - Agentic RAG                  → Session 10
+        - Graph RAG                    → Advanced module
+
+Dependencies:
+    pip install llama-index-core llama-index-embeddings-huggingface
                llama-index-llms-groq langchain langchain-community langchain-groq
-
-Conceptual notes shown in comments below:
-    - Agentic RAG: where it fits, why it's not here
-    - Graph RAG: where it fits, why it's not here
 """
 
-from app.rag.session9_query_rewriter import rewrite_and_show
-from app.rag.session9_comparison import (
-    compare_dense_vs_keyword,
-    compare_retrievers,
-    _get_dense,
-    _get_bm25,
-    _get_llamaindex,
-    _get_langchain,
-)
+from app.rag.session9_comparison import compare_answers
+from app.rag.session9_llamaindex_pipeline import LlamaIndexPipeline
+from app.rag.session9_langchain_pipeline import LangChainPipeline
+from app.rag.interview_pipeline import InterviewRAGPipeline
+
+DATA_DIR = "data/interview_prep"
 
 
 # ---------------------------------------------------------------------------
 # Helpers
 # ---------------------------------------------------------------------------
 
-def print_header(title: str, step: int) -> None:
+def print_header(step: int, title: str) -> None:
     width = 70
     print("\n\n" + "=" * width)
     print(f"  STEP {step}: {title}")
     print("=" * width)
 
 
-def ask_and_show(pipeline, query: str, label: str) -> None:
-    """Calls .query() on a pipeline and prints the answer."""
-    print(f"\n  [{label}] Query: \"{query}\"")
-    print("-" * 70)
-    answer = pipeline.query(query)
-    print(f"\n  Answer:\n  {answer}")
+def print_answer(label: str, answer: str) -> None:
+    print(f"\n  [{label}]")
+    print(f"  {answer.strip()}")
 
 
 # ---------------------------------------------------------------------------
@@ -64,191 +67,173 @@ def ask_and_show(pipeline, query: str, label: str) -> None:
 def main():
     print("\n")
     print("*" * 70)
-    print("*  SESSION 9: ADVANCED RAG FRAMEWORKS — PLAYGROUND               *")
+    print("*  SESSION 9: ADVANCED RAG FRAMEWORKS                             *")
+    print("*  Manual Pipeline vs LlamaIndex vs LangChain                     *")
     print("*" * 70)
-    print("""
-  What we'll cover:
-    STEP 1 — Query Rewriting (pre-retrieval transformation)
-    STEP 2 — Dense vs Keyword retrieval (same query, different results)
-    STEP 3 — LlamaIndex RAG (framework abstraction: index-centric)
-    STEP 4 — LangChain RAG (framework abstraction: chain-centric)
-    STEP 5 — Full 4-way comparison on a conflict-resolution query
-
-  Note on Agentic RAG:
-    An agent would decide WHICH retriever to use, WHEN to retrieve,
-    and WHETHER to retrieve a second time. We don't build that here.
-    See: LangChain Agents, LlamaIndex ReAct — explore post-session.
-
-  Note on Graph RAG:
-    Entities (companies, roles, rounds) would be nodes in a graph.
-    Retrieval would traverse the graph to find connected facts.
-    This requires entity extraction + graph construction — beyond scope.
-    See: Microsoft's GraphRAG paper (2024) for a production example.
-    """)
 
     # -----------------------------------------------------------------------
-    # Pre-build all pipelines upfront so the demo flows without wait times
+    # Pre-build all three pipelines once
     # -----------------------------------------------------------------------
-    print("\n  Building all pipelines (this takes ~1 min, do it once)...")
-    dense_pipeline = _get_dense()
-    bm25_retriever = _get_bm25()
-    llamaindex_pipeline = _get_llamaindex()
-    langchain_pipeline = _get_langchain()
-    print("\n  All pipelines ready. Starting demo...\n")
-
-    # -----------------------------------------------------------------------
-    # STEP 1: Query Rewriting
-    # -----------------------------------------------------------------------
-    print_header("Query Rewriting — Pre-Retrieval Transformation", step=1)
-    print("""
-  Student mental model:
-    Retrieval quality = f(query quality).
-    A vague query gives a vague embedding → poor cosine matches.
-    Rewriting makes the query specific before it hits the vector store.
-    """)
-
-    vague_queries = [
-        "What about 2025?",
-        "Tell me about rounds",
-        "How does the hiring work?",
-    ]
-
-    for vq in vague_queries:
-        rewrite_and_show(vq)
-
-    print("\n  Try it: After rewriting, run the rewritten query through retrieval")
-    print("  and compare the top results to the original query's results.")
-
-    # -----------------------------------------------------------------------
-    # STEP 2: Dense vs Keyword Retrieval
-    # -----------------------------------------------------------------------
-    print_header("Dense vs Keyword — Same Query, Different Results", step=2)
-    print("""
-  Dense retrieval wins on:   semantic meaning, paraphrased queries
-  Keyword (BM25) wins on:   exact terms, rare company/product names
-
-  Watch closely: which method finds the right source first?
-    """)
-
-    compare_dense_vs_keyword(
-        "What data structures are commonly tested in Amazon interviews?"
+    print("\n  Building all three pipelines (this takes ~1 min)...")
+    manual = InterviewRAGPipeline(
+        provider="groq",
+        data_dir=DATA_DIR,
+        chunk_size=200,
+        overlap=30,
+        top_k=5,
     )
-    print("  -- Above: 'data structures' is a common term - dense should win --\n")
-
-    compare_dense_vs_keyword(
-        "Oracle OCI cloud deployment exercise"
-    )
-    print("  -- Above: 'OCI' is a specific acronym - BM25 keyword may win --\n")
+    llamaindex = LlamaIndexPipeline(data_dir=DATA_DIR, top_k=5)
+    langchain  = LangChainPipeline(data_dir=DATA_DIR, top_k=5)
+    print("\n  All three pipelines ready. Starting demo...\n")
 
     # -----------------------------------------------------------------------
-    # STEP 3: LlamaIndex Pipeline
+    # STEP 1: Manual Pipeline — Session 8 Recap
     # -----------------------------------------------------------------------
-    print_header("LlamaIndex RAG — Framework-Based (Index-Centric)", step=3)
+    print_header(1, "Session 8 Manual Pipeline — What we built by hand")
+    print("""
+  Session 8 pipeline (8 modules, explicit control):
+    loaders.py           → load .md and .pdf
+    normalization.py     → unified Document schema
+    chunking.py          → word-based, metadata-aware
+    embedding.py         → HuggingFace all-MiniLM-L6-v2
+    vector_store.py      → FAISS IndexFlatIP
+    retriever.py         → top-k cosine search
+    prompt_builder.py    → source-aware, conflict-resolution prompt
+    interview_pipeline.py→ InterviewRAGPipeline
+
+  Every step visible. Every step controllable.
+  The cost: ~600 lines of code to get here.
+    """)
+
+    q1 = "What data structures are commonly tested in Amazon interviews?"
+    print(f"  Demo query: \"{q1}\"")
+    result = manual.query(q1)
+    print_answer("Session 8 Manual", result["answer"])
+
+    print("\n  Sources used:")
+    for s in result.get("sources_used", []):
+        label = "PRIVATE" if "private" in s.get("source_type", "") else "PUBLIC"
+        print(f"    [{label}] {s['company']} — {s['source']}")
+
+    # -----------------------------------------------------------------------
+    # STEP 2: LlamaIndex Pipeline
+    # -----------------------------------------------------------------------
+    print_header(2, "LlamaIndex — Index-Centric Framework")
     print("""
   LlamaIndex philosophy:
-    Build an index ONCE, query it MANY times.
-    The index is the unit — not the chain.
+    Build an index. Query the index.
+    The index is the central abstraction — not the chain, not the prompt.
 
-  What's abstracted (vs Session 8 manual pipeline):
-    - Chunking (uses token-based splitter, not word-based)
-    - Prompt building (internal default prompt)
-    - Context assembly (handled inside the query engine)
+  What it compresses vs Session 8:
+    SimpleDirectoryReader   → replaces loaders.py + normalization.py
+    VectorStoreIndex        → replaces chunking + embedding + FAISS
+    query_engine.query()    → replaces retriever + prompt_builder + LLM call
 
-  What's the same:
-    - HuggingFace embedding model (all-MiniLM-L6-v2)
-    - Groq LLM (same API key)
+  What you lose:
+    - Custom metadata per source (no source_type / company / page labels)
+    - Control over chunk boundaries (token-based internally)
+    - Custom conflict-resolution prompts
+    - Visibility into what's happening inside
+
+  Line count: ~30 lines of setup vs ~600 lines manual
     """)
 
-    ask_and_show(
-        llamaindex_pipeline,
-        "What system design topics should I prepare for Google interviews?",
-        label="LlamaIndex",
-    )
+    print(f"  Demo query: \"{q1}\"")
+    answer_li = llamaindex.query(q1)
+    print_answer("LlamaIndex", answer_li)
 
-    ask_and_show(
-        llamaindex_pipeline,
-        "Has Microsoft changed how many rounds it conducts in 2025?",
-        label="LlamaIndex",
-    )
+    print("\n  Retrieved sources (no metadata label — that's the tradeoff):")
+    for r in llamaindex.retrieve_only(q1):
+        print(f"    Rank {r['rank']}: {r['source']} (score: {r['score']:.4f})")
 
     # -----------------------------------------------------------------------
-    # STEP 4: LangChain Pipeline
+    # STEP 3: LangChain Pipeline
     # -----------------------------------------------------------------------
-    print_header("LangChain RAG — Framework-Based (Chain-Centric)", step=4)
+    print_header(3, "LangChain — Chain-Centric Framework")
     print("""
   LangChain philosophy:
-    Compose steps into CHAINS. Each step is explicit and swappable.
+    Compose steps as a chain. Each step is explicit and swappable.
     The chain is the unit — not the index.
 
-  What's abstracted (vs Session 8 manual pipeline):
-    - Document loading (DirectoryLoader)
-    - Chunking (RecursiveCharacterTextSplitter, character-based)
-    - Chain execution (RetrievalQA.from_chain_type)
+  What it compresses vs Session 8:
+    DirectoryLoader / PyPDFLoader → replaces loaders.py
+    RecursiveCharacterTextSplitter→ replaces chunking.py (character-based)
+    LangChain FAISS wrapper        → replaces vector_store.py
+    RetrievalQA chain              → replaces retriever + prompt + LLM
 
-  What's different from LlamaIndex:
-    - "stuff" chain type = all chunks concatenated into one context
-    - Character-based splitting → different chunk boundaries
-    - Score visibility: LangChain retriever doesn't expose scores by default
+  Key difference from LlamaIndex:
+    - Character-based chunking (not word/token-based)
+    - Chain composition is explicit (RetrievalQA.from_chain_type)
+    - Better for multi-step workflows and tool integration
+    - Weaker on pure document-indexing use cases
+
+  LangChain shines when:
+    - You need to chain retrieval + tool calls + external APIs
+    - You're building agents (Session 10)
+    - Your system has multiple retrieval sources with routing logic
     """)
 
-    ask_and_show(
-        langchain_pipeline,
-        "What behavioral questions are common at Adobe interviews?",
-        label="LangChain",
-    )
-
-    ask_and_show(
-        langchain_pipeline,
-        "Which companies have added AI assessment rounds in 2025?",
-        label="LangChain",
-    )
+    print(f"  Demo query: \"{q1}\"")
+    answer_lc = langchain.query(q1)
+    print_answer("LangChain", answer_lc)
 
     # -----------------------------------------------------------------------
-    # STEP 5: Full 4-Way Comparison on a Conflict Query
+    # STEP 4: Framework Comparison
     # -----------------------------------------------------------------------
-    print_header("Full 4-Way Comparison — Conflict Resolution Query", step=5)
+    print_header(4, "Framework Comparison — Same Question, Three Answers")
     print("""
-  This query has a conflict:
-    Public source (google.md):            says 5 coding rounds
-    Private source (PDF, 2025 update):    says 3 rounds now
-
-  Watch which retrievers surface the private PDF vs the public markdown.
-  Dense retrieval (seeded with 2025 content) should rank the PDF higher.
-  BM25 depends on keyword overlap.
+  Now let's run the same question through all three and compare.
+  Look at:
+    1. Answer quality — are they substantially different?
+    2. Source visibility — which shows you WHERE it retrieved from?
+    3. Control — which would you trust in production?
     """)
 
-    compare_retrievers(
-        "How many coding rounds does Google conduct for SDE interviews in 2025?"
+    compare_answers(
+        question="Has Microsoft changed its interview format for 2025?",
+        manual_pipeline=manual,
+        llamaindex_pipeline=llamaindex,
+        langchain_pipeline=langchain,
+    )
+
+    compare_answers(
+        question="Which companies have added AI-related assessments to their interview process in 2025?",
+        manual_pipeline=manual,
+        llamaindex_pipeline=llamaindex,
+        langchain_pipeline=langchain,
     )
 
     # -----------------------------------------------------------------------
     # Summary
     # -----------------------------------------------------------------------
     print("\n\n" + "=" * 70)
-    print("  PLAYGROUND COMPLETE")
+    print("  SESSION 9 COMPLETE")
     print("=" * 70)
     print("""
-  What Session 9 introduced vs Session 8:
+  Framework comparison summary:
 
-    Manual Pipeline (Session 8)     → Full control, verbose, educational
-    LlamaIndex Pipeline (Session 9) → Same result, 30 lines vs 100+
-    LangChain Pipeline (Session 9)  → Chain-first composition pattern
-    BM25 Keyword (Session 9)        → No vectors, exact-match baseline
-    Query Rewriting (Session 9)     → Pre-retrieval query improvement
+  ┌─────────────────────┬──────────────┬──────────────┬──────────────┐
+  │                     │ Manual (S8)  │  LlamaIndex  │  LangChain   │
+  ├─────────────────────┼──────────────┼──────────────┼──────────────┤
+  │ Setup code          │ ~600 lines   │ ~30 lines    │ ~40 lines    │
+  │ Mental model        │ Full control │ Index-first  │ Chain-first  │
+  │ Chunking            │ Word-based   │ Token-based  │ Char-based   │
+  │ Source metadata     │ Full (S8)    │ Filename only│ Filename only│
+  │ Custom prompts      │ Yes          │ Hard         │ Configurable │
+  │ Agent support       │ No           │ Yes (S10)    │ Yes (S10)    │
+  │ Prototype speed     │ Slow         │ Fast         │ Fast         │
+  └─────────────────────┴──────────────┴──────────────┴──────────────┘
 
-  Design space expand:
-    Dense retrieval        → [Session 7 + 8]  you built this
-    Multi-source ingestion → [Session 8]       you built this
-    Framework abstraction  → [Session 9]       today
-    Keyword baseline       → [Session 9]       today
-    Query rewriting        → [Session 9]       today
-    Agentic RAG            → [Next module]     LLM decides what to do
-    Graph RAG              → [Advanced]        entities as graph nodes
+  Lesson:
+    Frameworks are not better than manual. They make different tradeoffs.
+    After building it manually in Sessions 7–8, you now understand what
+    LlamaIndex and LangChain are hiding — and when that matters.
 
-  Engineering lesson:
-    Frameworks don't eliminate the need to understand fundamentals.
-    They hide complexity — but bugs hide there too.
-    Know what's underneath before you trust the abstraction.
+  Coming in Session 10:
+    - BM25 / keyword retrieval baseline
+    - Query rewriting (pre-retrieval transformation)
+    - Dense + keyword hybrid search
+    - Agentic retrieval patterns
     """)
 
 
