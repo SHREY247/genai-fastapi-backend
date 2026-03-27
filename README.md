@@ -534,54 +534,73 @@ These are future sessions. Today's goal is to internalize the retrieval fundamen
 
 ---
 
+## Session 8 — Advanced Demo Commands
+
+These commands demonstrate the **Session 8** upgrades: multi-source ingestion (.md + .pdf), metadata-aware retrieval, and conflict resolution.
+
+### Ingestion & Normalization
+```bash
+python -c "
+from app.rag.loaders import load_directory
+from app.rag.normalization import normalize_documents
+docs = load_directory('data/interview_prep')
+normalized = normalize_documents(docs)
+for d in normalized:
+    print(f'[{d.source_type:11}] {d.company:10} | {d.source[:30]:30} | {len(d.text)} chars')
+"
+```
+
+### Metadata-Aware Retrieval (The Citation Layer)
+```bash
+python -c "
+from app.rag.interview_pipeline import InterviewRAGPipeline
+p = InterviewRAGPipeline(data_dir='data/interview_prep')
+query = 'How many rounds does Google have?'
+results = p.inspect_retrieval(query, top_k=3)
+for r in results:
+    label = 'PRIVATE' if 'private' in r['source_type'] else 'PUBLIC'
+    page = f'p.{r[\"page\"]}' if r.get('page') else 'N/A'
+    print(f'[{label}] {r[\"company\"]:10} | {r[\"source\"]:25} | {page:5} | Score: {r[\"score\"]:.4f}')
+"
+```
+
 ---
 
-## What's New in Session 9
+## Session 9 — Framework Demo Commands
 
-Session 9 focuses on **Framework-based RAG** — comparing how LlamaIndex and LangChain abstract the manual work done in Sessions 7 and 8.
+Compare how **LlamaIndex** and **LangChain** compress the Session 8 pipeline.
 
-### Framework Paradigms, Side by Side
-
-| Paradigm | Module | What it teaches |
-|----------|--------|--------------------|
-| Manual (Session 8) | `interview_pipeline.py` | Full control, 8 explicit modules, source-aware |
-| LlamaIndex | `session9_llamaindex_pipeline.py` | Index-centric abstraction (compact, opinionated) |
-| LangChain | `session9_langchain_pipeline.py` | Chain-centric abstraction (composable, explicit steps) |
-
-### Also Added
-
-| Module | Purpose |
-|--------|---------|
-| `app/rag/session9_comparison.py` | 3-way answer comparison runner |
-| `app/rag/session9_playground.py` | 4-step framework-focused demo |
-| `SESSION_9_WALKTHROUGH.md` | Concise instructor guide for the session |
-
-### New Dependencies (Session 9)
-
-```
-llama-index-core
-llama-index-embeddings-huggingface
-llama-index-llms-groq
-langchain
-langchain-community
-langchain-groq
-```
-
-### Getting Started (Session 9)
-
+### Step 1 — The Full 4-Step Playground
+**Goal**: Run the modular walkthrough (Manual → LlamaIndex → LangChain → Table).
 ```bash
-git fetch origin
-git checkout session-9-advanced-rag-frameworks
-pip install -r requirements.txt
-```
-
-### Run Session 9
-
-```bash
-# Full 4-step framework demo
 python -m app.rag.session9_playground
+```
 
-# Quick 3-way comparison only
+### Step 2 — Standalone LlamaIndex (Index-Centric)
+**Goal**: Show a complete RAG result in ~3 lines of logic.
+```bash
+python -c "
+from app.rag.session9_llamaindex_pipeline import LlamaIndexPipeline
+p = LlamaIndexPipeline(data_dir='data/interview_prep')
+print('\nANSWER (LlamaIndex):', p.query('What data structures are common at Amazon?'))
+"
+```
+
+### Step 3 — Standalone LangChain (Chain-Centric)
+**Goal**: Show LangChain's structured return (Answer + Sources).
+```bash
+python -c "
+from app.rag.session9_langchain_pipeline import LangChainPipeline
+p = LangChainPipeline(data_dir='data/interview_prep')
+res = p.query('Which companies added AI assessments in 2025?')
+print('\nANSWER (LangChain):', res['answer'])
+print('SOURCES:', res['sources'])
+"
+```
+
+### Step 4 — Three-Way Head-to-Head Comparison
+**Goal**: Direct comparison of answer quality and source visibility.
+```bash
 python -c "
 from app.rag.session9_comparison import compare_answers
 from app.rag.interview_pipeline import InterviewRAGPipeline
