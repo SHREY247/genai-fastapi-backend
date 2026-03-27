@@ -25,6 +25,7 @@ This session teaches you to build and reason about that retrieval system.
 | `feature/session-4-llm-gateway` | Session 4 | Provider-agnostic LLM gateway (Groq, OpenAI, Anthropic) |
 | `feature/session-7-rag-foundations` | Session 7 | RAG foundations — embeddings, FAISS, grounded answers |
 | `session-8-interview-rag-ingestion` | Session 8 | Multi-source RAG — markdown + PDF ingestion, source-aware answers |
+| `session-9-advanced-rag-frameworks` | Session 9 | Framework-based RAG — LlamaIndex, LangChain, BM25, query rewriting |
 
 ---
 
@@ -530,3 +531,77 @@ These are future sessions. Today's goal is to internalize the retrieval fundamen
 > **RAG is a retrieval problem disguised as a generation problem.**
 >
 > Most teams debug the LLM when the answer is wrong. The fix is almost always in the retrieval layer — better chunking, better embeddings, better scoring. Fix retrieval first. The generation will follow.
+
+---
+
+## What's New in Session 9
+
+Session 9 extends the system to teach **framework-based RAG** and **retrieval paradigm comparison**. Session 8's pipeline is left untouched.
+
+### Four Retrieval Paradigms, Side by Side
+
+| Paradigm | Module | What it teaches |
+|----------|--------|--------------------|
+| Manual Dense (S8) | `interview_pipeline.py` | FAISS + HF embeddings, full control |
+| BM25 Keyword | `session9_keyword_retriever.py` | No vectors, exact-match baseline |
+| LlamaIndex | `session9_llamaindex_pipeline.py` | Index-centric framework abstraction |
+| LangChain | `session9_langchain_pipeline.py` | Chain-centric framework abstraction |
+
+### Also Added
+
+| Module | Purpose |
+|--------|---------|
+| `app/rag/session9_query_rewriter.py` | LLM-based query rewrite before retrieval |
+| `app/rag/session9_comparison.py` | Run same query across all 4 retrievers |
+| `app/rag/session9_playground.py` | 5-step master demo |
+
+### New Dependencies (Session 9)
+
+```
+rank-bm25                        # BM25 keyword scoring
+llama-index-core                 # LlamaIndex indexing + querying
+llama-index-embeddings-huggingface  # Local HF embeddings (no OpenAI key)
+llama-index-llms-groq            # Groq integration for LlamaIndex
+langchain                        # Chain composition framework
+langchain-community              # FAISS wrapper, loaders
+langchain-groq                   # Groq integration for LangChain
+```
+
+### Getting Started (Session 9)
+
+```bash
+git fetch origin
+git checkout session-9-advanced-rag-frameworks
+pip install -r requirements.txt
+```
+
+### Run Session 9
+
+```bash
+# Full 5-step interactive demo
+python -m app.rag.session9_playground
+
+# Quick dense vs keyword comparison only
+python -c "
+from app.rag.session9_comparison import compare_dense_vs_keyword
+compare_dense_vs_keyword('How many coding rounds does Google have?')
+"
+
+# Full 4-way comparison
+python -c "
+from app.rag.session9_comparison import compare_retrievers
+compare_retrievers('What AI assessments did companies add in 2025?')
+"
+```
+
+### Conceptual Positioning
+
+> **LlamaIndex** — best for document-centric indexing pipelines and structured retrieval. Opinionated, concise.
+>
+> **LangChain** — best for chain composition, tool integration, and agent workflows (agents = Session 10).
+>
+> **BM25** — no models, no GPU. Excels on exact terminology, rare terms. Fails on semantic paraphrasing.
+>
+> **Agentic RAG** — the LLM decides *which* tool to call, *when*, and whether to retrieve again. Not built here — explore LangChain Agents or LlamaIndex ReAct post-session.
+>
+> **Graph RAG** — entities and relationships stored as a graph, traversed at query time. See Microsoft's GraphRAG (2024) for a production example.

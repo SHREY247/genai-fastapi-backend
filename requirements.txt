@@ -8,3 +8,12 @@ faiss-cpu
 numpy
 pypdf
 fpdf2
+
+# Session 9: Advanced RAG Frameworks
+rank-bm25
+llama-index-core
+llama-index-embeddings-huggingface
+llama-index-llms-groq
+langchain
+langchain-community
+langchain-groq
