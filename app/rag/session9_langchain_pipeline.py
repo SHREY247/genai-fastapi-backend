@@ -36,7 +36,7 @@ Conceptual note on Agentic RAG (for instructors):
 import os
 from typing import List, Dict, Optional
 
-from langchain_community.document_loaders import DirectoryLoader, UnstructuredMarkdownLoader
+from langchain_community.document_loaders import DirectoryLoader
 from langchain_community.vectorstores import FAISS as LangChainFAISS
 from langchain_community.embeddings import HuggingFaceEmbeddings
 from langchain_groq import ChatGroq
@@ -149,24 +149,29 @@ class LangChainPipeline:
 
         return documents
 
-    def query(self, question: str) -> str:
+    def query(self, question: str) -> Dict:
         """
         Runs the RetrievalQA chain: retrieve → stuff context → LLM answer.
 
-        Returns the LLM's answer as a plain string.
+        Returns:
+            Dict: {"answer": str, "sources": List[str]}
         """
         print(f"\n[LangChain] Query: \"{question}\"")
         result = self.chain.invoke({"query": question})
         answer = result.get("result", "No answer returned")
-        sources = result.get("source_documents", [])
+        source_docs = result.get("source_documents", [])
 
-        if sources:
-            unique_sources = list({
-                doc.metadata.get("file_name", "unknown") for doc in sources
-            })
+        unique_sources = []
+        if source_docs:
+            unique_sources = sorted(list({
+                doc.metadata.get("file_name", "unknown") for doc in source_docs
+            }))
             print(f"[LangChain] Sources used: {unique_sources}")
 
-        return answer
+        return {
+            "answer": answer,
+            "sources": unique_sources
+        }
 
     def retrieve_only(self, question: str) -> List[Dict]:
         """

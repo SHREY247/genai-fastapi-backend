@@ -174,8 +174,10 @@ def main():
     """)
 
     print(f"  Demo query: \"{q1}\"")
-    answer_lc = langchain.query(q1)
-    print_answer("LangChain", answer_lc)
+    result_lc = langchain.query(q1)
+    print_answer("LangChain", result_lc["answer"])
+    if result_lc.get("sources"):
+        print(f"\n  Sources used: {result_lc['sources']}")
 
     # -----------------------------------------------------------------------
     # STEP 4: Framework Comparison

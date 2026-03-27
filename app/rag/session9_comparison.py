@@ -85,9 +85,15 @@ def compare_answers(
     # ── 3. LangChain ─────────────────────────────────────────────────────────
     print("\n  ── 3. LangChain ──")
     try:
-        answer_lc = langchain_pipeline.query(question)
+        result_lc = langchain_pipeline.query(question)
+        answer_lc = result_lc.get("answer", "[no answer]")
+        sources_lc = result_lc.get("sources", [])
+
         print(f"  Answer: {str(answer_lc).strip()[:400]}")
-        # Sources are printed inside langchain_pipeline.query() already
+        if sources_lc:
+            print(f"  Sources (found {len(sources_lc)}):")
+            for s in sources_lc:
+                print(f"    - {s}")
     except Exception as e:
         print(f"  [ERROR] {e}")
 
