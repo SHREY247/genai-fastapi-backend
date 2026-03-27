@@ -494,6 +494,69 @@ Replace `YOUR QUESTION HERE` with anything the audience asks.
 
 ---
 
+## Session 8 — Advanced Demo Commands
+
+These commands demonstrate the **Session 8** upgrades: multi-source ingestion (.md + .pdf), metadata-aware retrieval, and conflict resolution.
+
+### Step 1 — Multi-Source Ingestion & Normalization
+**Goal**: Show the system handling different file types and assigning metadata.
+
+```bash
+python -c "
+from app.rag.loaders import load_directory
+from app.rag.normalization import normalize_documents
+docs = load_directory('data/interview_prep')
+normalized = normalize_documents(docs)
+for d in normalized:
+    print(f'[{d.source_type:11}] {d.company:10} | {d.source[:30]:30} | {len(d.text)} chars')
+"
+```
+
+### Step 2 — Metadata-Aware Retrieval
+**Goal**: Inspect the retrieval layer to see exactly where chunks are coming from (including page numbers).
+
+```bash
+python -c "
+from app.rag.interview_pipeline import InterviewRAGPipeline
+p = InterviewRAGPipeline(data_dir='data/interview_prep')
+query = 'How many rounds does Google have?'
+results = p.inspect_retrieval(query, top_k=3)
+for r in results:
+    label = 'PRIVATE' if 'private' in r['source_type'] else 'PUBLIC'
+    page = f'p.{r[\"page\"]}' if r.get('page') else 'N/A'
+    print(f'[{label}] {r[\"company\"]:10} | {r[\"source\"]:25} | {page:5} | Score: {r[\"score\"]:.4f}')
+"
+```
+
+### Step 3 — Conflict Resolution (The "Aha" Moment)
+**Goal**: Ask a question that has conflicting info in public (old) vs private (2025 update) files.
+
+```bash
+python -c "
+from app.rag.interview_pipeline import InterviewRAGPipeline
+p = InterviewRAGPipeline(data_dir='data/interview_prep')
+query = 'How many rounds does Google conduct for SDE roles in 2025?'
+print('\nQUERY: ' + query + '\n' + '-'*50)
+print(p.query(query)['answer'])
+"
+```
+**Expected**: The system should prefer the **Private PDF** update and mention the reduction to 3 rounds.
+
+### Step 4 — Cross-Company Reasoning
+**Goal**: Ask a question that requires synthesis across multiple company sources.
+
+```bash
+python -c "
+from app.rag.interview_pipeline import InterviewRAGPipeline
+p = InterviewRAGPipeline(data_dir='data/interview_prep')
+query = 'Which companies have added specific AI-related interview assessments in 2025?'
+print('\nQUERY: ' + query + '\n' + '-'*50)
+print(p.query(query)['answer'])
+"
+```
+
+---
+
 ## This Is Not Production
 
 This system is designed for learning, not deployment. Know the gaps:
