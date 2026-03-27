@@ -18,9 +18,14 @@ setup_logging()
 
 # ---- Create the FastAPI app ----
 app = FastAPI(
-    title="GenAI LLM Gateway Backend",
-    description="A production-style FastAPI backend with a provider-agnostic LLM gateway supporting Groq, OpenAI, and Anthropic.",
-    version="1.1.0"
+    title="GenAI FastAPI Backend",
+    description=(
+        "Applied GenAI Engineering course backend. "
+        "Session 4: Provider-agnostic LLM gateway. "
+        "Session 7: RAG foundations. "
+        "Session 8: Multi-source interview prep RAG."
+    ),
+    version="1.2.0"
 )
 
 # ---- Root route ----
@@ -28,9 +33,9 @@ app = FastAPI(
 def root():
     """Quick check that the server is alive."""
     return {
-        "message": "GenAI LLM Gateway Backend is running",
+        "message": "GenAI FastAPI Backend is running",
         "status": "online",
-        "session": 4
+        "latest_session": 8
     }
 
 # ---- Register routers ----

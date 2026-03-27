@@ -6,3 +6,5 @@ python-dotenv
 sentence-transformers
 faiss-cpu
 numpy
+pypdf
+fpdf2

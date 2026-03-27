@@ -1,10 +1,12 @@
 """
 app/rag/
 --------
-Session 7 - RAG (Retrieval-Augmented Generation) Foundations.
+RAG (Retrieval-Augmented Generation) package.
 
-This package implements a standalone RAG pipeline using:
-- Hugging Face sentence-transformers for dense embeddings
-- FAISS for local vector indexing and retrieval
-- The existing LLM gateway for grounded answer generation
+Session 7 - RAG Foundations:
+  Basic RAG pipeline with .txt ingestion, chunking, embeddings, FAISS retrieval.
+
+Session 8 - Interview Prep RAG (Multi-Source Ingestion):
+  Extended pipeline supporting markdown + PDF ingestion, unified document
+  schema, metadata-aware chunking, and source-aware answer generation.
 """

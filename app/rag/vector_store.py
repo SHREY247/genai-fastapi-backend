@@ -102,12 +102,9 @@ class FAISSVectorStore:
             if idx == -1:
                 continue  # FAISS returns -1 for unfilled slots
             record = self.records[idx]
-            results.append({
-                "rank": rank + 1,
-                "source": record["source"],
-                "chunk_id": record["chunk_id"],
-                "text": record["text"],
-                "score": float(score),
-            })
+            # Forward ALL fields from the stored record (not just source/chunk_id/text)
+            # This allows Session 8 metadata (company, source_type, page) to flow through
+            result = {"rank": rank + 1, **record, "score": float(score)}
+            results.append(result)
 
         return results
