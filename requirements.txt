@@ -16,3 +16,6 @@ llama-index-llms-groq
 langchain
 langchain-community
 langchain-groq
+
+# Session 10: Retrieval Optimization
+rank-bm25

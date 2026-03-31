@@ -26,6 +26,7 @@ This session teaches you to build and reason about that retrieval system.
 | `feature/session-7-rag-foundations` | Session 7 | RAG foundations — embeddings, FAISS, grounded answers |
 | `session-8-interview-rag-ingestion` | Session 8 | Multi-source RAG — markdown + PDF ingestion, source-aware answers |
 | `session-9-advanced-rag-frameworks` | Session 9 | Framework-based RAG — LlamaIndex, LangChain, BM25, query rewriting |
+| `session10_retrieval_optimization` | Session 10 | Retrieval Optimization — BM25, Hybrid Search, Query Rewriting, multi-strategy comparison |
 
 ---
 
@@ -620,5 +621,359 @@ compare_answers('Has Microsoft changed its interview format for 2025?', m, li, l
 > **LlamaIndex** — best for document-centric indexing pipelines and structured retrieval.
 >
 > **LangChain** — best for chain composition, tool integration, and orchestration.
->
-> **Preview: Session 10** — We will introduce **BM25 Keyword Retrieval**, **Query Rewriting**, and **Hybrid Search** (Dense + Sparse) to further optimize retrieval performance.
+
+---
+
+## What's New in Session 10
+
+Session 10 introduces a **modular, multi-signal retrieval system** that fixes the failure modes of pure vector retrieval.
+
+### The Problem Session 10 Solves
+
+Vector retrieval alone fails on two important query types:
+- **Keyword-heavy queries** — "Oracle OCI cloud interview" → vectors miss exact name matches
+- **Vague/ambiguous queries** — "Tell me about the rounds" → no retriever can help if the query is bad
+
+### The Solution: Three Retrieval Strategies + Query Rewriting
+
+```
+Query ──┬── Vector   (semantic meaning — existing FAISS pipeline)
+        ├── BM25     (keyword match — new, no GPU required)
+        └── Hybrid   (fused vector + BM25 scores)
+           └── + Query Rewrite (LLM expands vague intent before retrieval)
+```
+
+### New Modules
+
+| Module | Purpose |
+|--------|---------|
+| `app/rag/session10/retrieval_strategies/vector.py` | Wraps existing FAISS as a Session 10 retriever |
+| `app/rag/session10/retrieval_strategies/bm25.py` | BM25 keyword retriever with custom tokenizer |
+| `app/rag/session10/retrieval_strategies/hybrid.py` | Fuses vector + BM25 via weighted normalized scores |
+| `app/rag/session10/scoring.py` | Min-max score normalization (demo-friendly) |
+| `app/rag/session10/query_rewriter.py` | LLM-assisted pre-retrieval query rewriting |
+| `app/rag/session10/pipeline.py` | `Session10Pipeline` — pluggable, single-query runner |
+| `app/rag/session10/comparison.py` | Runs same query across all 4 modes, shows latency breakdown |
+| `app/rag/session10/failure_cases.py` | 8 curated failure cases that expose retrieval weaknesses |
+| `app/rag/session10/playground.py` | Demo entry-point (`--demo`, `--failures`, `--interactive`, `--no-answers`) |
+
+### New Dependency
+
+```
+rank-bm25   # BM25 keyword retrieval
+```
+
+### Session 9 Code Untouched
+
+All Session 9 modules (`session9_llamaindex_pipeline.py`, `session9_langchain_pipeline.py`, `session9_comparison.py`, `session9_playground.py`) are fully preserved. Session 10 is contained entirely within `app/rag/session10/`.
+
+---
+
+## Session 10 — Demo Commands
+
+These commands demonstrate the **Session 10** multi-signal retrieval system. Run them from the repo root in order.
+
+### Step 1 — Check out the branch and install new dependency
+
+```bash
+git checkout session10_retrieval_optimization
+pip install rank-bm25
+```
+
+### Step 2 — BM25: keyword retrieval on a specific-name query
+
+**Goal**: Show that BM25 matches exact tokens where vector retrieval struggles.
+
+```bash
+python -c "
+from app.rag.session10.retrieval_strategies.bm25 import BM25Retriever
+r = BM25Retriever(data_dir='data/interview_prep')
+results = r.retrieve('Oracle OCI cloud', top_k=3)
+for x in results:
+    print(f'{x[\"chunk_id\"]:15s} {x[\"source\"]:40s} score={x[\"score\"]:.2f}')
+"
+```
+
+**Expected**: Oracle and OCI-specific chunks rank at the top. Score for the Oracle PDF chunk is significantly higher than the rest.
+
+---
+
+### Step 3 — Compare all three strategies on the same query
+
+**Goal**: Show how the same query produces different rankings under Vector vs BM25 vs Hybrid.
+
+```bash
+python -c "
+from app.rag.session10.retrieval_strategies import VectorRetriever, BM25Retriever, HybridRetriever
+vec = VectorRetriever(data_dir='data/interview_prep')
+bm = BM25Retriever.from_records(vec.records)
+hyb = HybridRetriever(vec, bm, alpha=0.5, beta=0.5)
+
+print('=== VECTOR ===')
+for r in vec.retrieve('Oracle OCI cloud interview', top_k=3):
+    print(f'  {r[\"chunk_id\"]:12s} score={r[\"score\"]:.3f} source={r[\"source\"]}')
+
+print()
+print('=== HYBRID ===')
+for r in hyb.retrieve('Oracle OCI cloud interview', top_k=3):
+    print(f'  {r[\"chunk_id\"]:12s} score={r[\"score\"]:.3f} (vec_norm={r[\"vec_norm\"]:.3f}, bm25_norm={r[\"bm25_norm\"]:.3f})')
+"
+```
+
+**Expected**: Hybrid chunk-11 (OCI PDF) gets `score=1.000` because both vector and BM25 rank it first — it appears in both result sets and gets the combined score.
+
+---
+
+### Step 4 — Query rewriting: before vs after
+
+**Goal**: Show how LLM rewriting expands vague intent into retrieval-friendly form.
+
+```bash
+python -c "
+from app.rag.session10.query_rewriter import rewrite_and_show
+rewrite_and_show('Tell me about the rounds')
+rewrite_and_show('amazon interview')
+rewrite_and_show('Oracle OCI cloud interview questions')
+"
+```
+
+**Expected**:
+```
+[QueryRewriter] Original : "Tell me about the rounds"
+[QueryRewriter] Rewritten: "What are the typical interview rounds involved in the hiring process?" [CHANGED]
+
+[QueryRewriter] Original : "amazon interview"
+[QueryRewriter] Rewritten: "Amazon interview process." [CHANGED]
+
+[QueryRewriter] Original : "Oracle OCI cloud interview questions"
+[QueryRewriter] Rewritten: "OCI cloud interview process and commonly asked questions" [CHANGED]
+```
+
+Note: The last query barely changed — it was already specific. A good rewriter knows when to leave things alone.
+
+---
+
+### Step 5 — Full playground: all strategies, all demo queries
+
+**Goal**: Run all 3 demo queries across all 4 modes (Vector, BM25, Hybrid, Hybrid+Rewrite) with a latency breakdown per phase.
+
+```bash
+# Fast mode — skip LLM answer generation, shows retrieval comparison only
+python -m app.rag.session10.playground --no-answers
+
+# Full mode — generates LLM answers (requires GROQ_API_KEY)
+python -m app.rag.session10.playground
+```
+
+**Expected latency pattern** (retrieval is fast — the LLM call dominates):
+```
+Strategy              Rewrite  Retrieval   Answer    Total
+--------------------  -------  ---------  -------  ------
+vector                      0          7      700+    700+
+bm25                        0          0      700+    700+
+hybrid                      0         21      700+    700+
+hybrid_rewrite            300         12      700+   1000+
+```
+
+**Key teaching point**: Retrieval (the thing we optimize) takes <25ms. The LLM answer generates in 700ms+. Every optimization in this session improves *quality*, not speed.
+
+---
+
+### Step 6 — Failure case analysis
+
+**Goal**: Run all 8 pre-defined failure cases that expose specific retrieval weaknesses.
+
+```bash
+python -m app.rag.session10.playground --failures --no-answers
+```
+
+Each case is annotated with `failure_type` (which strategy fails) and `best_strategy` (which one wins) — useful for classroom discussion.
+
+---
+
+### Step 7 — Interactive mode
+
+**Goal**: Let students try their own queries against all strategies in real time.
+
+```bash
+python -m app.rag.session10.playground --interactive --no-answers
+```
+
+Enter any query at the prompt. Type `quit` to exit.
+
+---
+
+## Session 10 — In-Class Live Demo Commands
+
+These are the **exact commands** run during each Act of the 90-minute session, in execution order.
+
+### Act 2 — BM25 keyword retrieval (run at ~0:20)
+
+```bash
+python -c "
+from app.rag.session10.retrieval_strategies.bm25 import BM25Retriever
+r = BM25Retriever(data_dir='data/interview_prep')
+results = r.retrieve('Oracle OCI cloud', top_k=3)
+for x in results:
+    print(f'{x[\"chunk_id\"]:10s} {x[\"source\"]:40s} score={x[\"score\"]:.2f}')
+"
+```
+
+**Expected**:
+```
+chunk-11   company_hiring_updates_2025.pdf          score=8.51
+chunk-20   oracle.md                                score=3.13
+chunk-19   oracle.md                                score=2.77
+```
+
+---
+
+### Act 3 — Hybrid retrieval with sub-scores (run at ~0:40)
+
+```bash
+python -c "
+from app.rag.session10.retrieval_strategies import VectorRetriever, BM25Retriever, HybridRetriever
+vec = VectorRetriever(data_dir='data/interview_prep')
+bm = BM25Retriever.from_records(vec.records)
+hyb = HybridRetriever(vec, bm, alpha=0.5, beta=0.5)
+for r in hyb.retrieve('Oracle OCI cloud interview', top_k=3):
+    print(f'{r[\"chunk_id\"]:10s} score={r[\"score\"]:.3f} (vec_norm={r[\"vec_norm\"]:.3f}, bm25_norm={r[\"bm25_norm\"]:.3f})')
+"
+```
+
+**Expected**:
+```
+chunk-11   score=1.000 (vec_norm=1.000, bm25_norm=1.000)
+chunk-20   score=0.387 (vec_norm=0.448, bm25_norm=0.326)
+chunk-18   score=0.294 (vec_norm=0.461, bm25_norm=0.126)
+```
+
+Teaching point: chunk-11 scores `1.000` because it ranked #1 in **both** retrievers. That's the power of hybrid fusion.
+
+---
+
+### Act 4 — Query rewriting (run at ~1:00)
+
+```bash
+python -c "
+from app.rag.session10.query_rewriter import rewrite_and_show
+rewrite_and_show('Tell me about the rounds')
+rewrite_and_show('amazon interview')
+rewrite_and_show('What about 2025?')
+rewrite_and_show('Oracle OCI cloud interview questions')
+"
+```
+
+**Expected**:
+```
+[QueryRewriter] Original : "Tell me about the rounds"
+[QueryRewriter] Rewritten: "What are the typical interview rounds involved in the hiring process?" [CHANGED]
+
+[QueryRewriter] Original : "amazon interview"
+[QueryRewriter] Rewritten: "Amazon interview process." [CHANGED]
+
+[QueryRewriter] Original : "What about 2025?"
+[QueryRewriter] Rewritten: "What changes have occurred in interview processes in 2025?" [CHANGED]
+
+[QueryRewriter] Original : "Oracle OCI cloud interview questions"
+[QueryRewriter] Rewritten: "OCI cloud interview process and commonly asked questions" [CHANGED]
+```
+
+Teaching point: the last query barely changed — it was already specific. A good rewriter knows when to leave things alone.
+
+---
+
+### Act 5 — Full playground (run at ~1:07)
+
+```bash
+# Retrieval-only comparison (faster, no LLM keys needed)
+python -m app.rag.session10.playground --no-answers
+
+# Full run with LLM answers
+python -m app.rag.session10.playground
+
+# All 8 failure cases
+python -m app.rag.session10.playground --failures --no-answers
+
+# Interactive — students type their own queries
+python -m app.rag.session10.playground --interactive --no-answers
+```
+
+**Expected latency table** from `--no-answers` run:
+```
+Strategy              Rewrite  Retrieval   Answer    Total
+--------------------  -------  ---------  -------  ------
+vector                      0          7        0        7
+bm25                        0          0        0        0
+hybrid                      0         21        0       21
+hybrid_rewrite            333         12        0      345
+```
+
+Teaching point: retrieval takes <25ms. Everything you optimize in Session 10 is about **quality**, not speed.
+
+---
+
+## Session 10 — The "Vector Fails" Classroom Demo
+
+Use **`"Bar Raiser veto power"`** to show the three-stage story in a single query:
+Vector fails → BM25 wins → Hybrid is best.
+
+> **Why this query?** "Bar Raiser" is an Amazon-specific term. The embedding model has no special semantic fingerprint for it — so vector scores collapse below 0.2. But BM25 finds the exact tokens `bar`, `raiser`, `veto`, `power` directly in `amazon.md`.
+
+```bash
+python -c "
+from app.rag.session10.retrieval_strategies import VectorRetriever, BM25Retriever, HybridRetriever
+
+vec = VectorRetriever(data_dir='data/interview_prep')
+bm  = BM25Retriever.from_records(vec.records)
+hyb = HybridRetriever(vec, bm, alpha=0.5, beta=0.5)
+
+q = 'Bar Raiser veto power'
+print(f'QUERY: {q!r}')
+
+print()
+print('=== VECTOR (FAILS) ===')
+for r in vec.retrieve(q, top_k=3):
+    print(f'  {r[\"chunk_id\"]:10s}  {r[\"source\"]:40s}  score={r[\"score\"]:.3f}')
+
+print()
+print('=== BM25 (WINS) ===')
+for r in bm.retrieve(q, top_k=3):
+    print(f'  {r[\"chunk_id\"]:10s}  {r[\"source\"]:40s}  score={r[\"score\"]:.2f}')
+
+print()
+print('=== HYBRID (BEST) ===')
+for r in hyb.retrieve(q, top_k=3):
+    print(f'  {r[\"chunk_id\"]:10s}  {r[\"source\"]:40s}  score={r[\"score\"]:.3f}  (vec={r[\"vec_norm\"]:.3f}, bm25={r[\"bm25_norm\"]:.3f})')
+" 2>/dev/null
+```
+
+**Verified output** (captured 2026-03-31):
+```
+QUERY: 'Bar Raiser veto power'
+
+=== VECTOR (FAILS) ===
+  chunk-7     company_hiring_updates_2025.pdf   score=0.171   ← below noise threshold
+  chunk-4     amazon.md                         score=0.161   ← right source, weak signal
+  chunk-12    company_hiring_updates_2025.pdf   score=0.129   ← wrong
+
+=== BM25 (WINS) ===
+  chunk-3     amazon.md                         score=8.68    ← direct hit on "Bar Raiser has veto power"
+  chunk-4     amazon.md                         score=6.18    ← also amazon
+  chunk-7     company_hiring_updates_2025.pdf   score=5.09    ← amazon update in PDF
+
+=== HYBRID (BEST) ===
+  chunk-4     amazon.md                         score=0.819   (vec=0.926, bm25=0.712)
+  chunk-7     company_hiring_updates_2025.pdf   score=0.793   (vec=1.000, bm25=0.587)
+  chunk-3     amazon.md                         score=0.504   (vec=0.009, bm25=1.000)
+```
+
+### What to say at each stage:
+
+| Stage | Scores | What it tells the class |
+|-------|--------|------------------------|
+| **Vector** | 0.17, 0.16, 0.13 | "Everything below 0.3 is noise. The model doesn't know 'Bar Raiser' is Amazon-specific." |
+| **BM25** | 8.68, 6.18, 5.09 | "50x stronger signal. The tokens `bar`, `raiser`, `veto`, `power` exist word-for-word in the Amazon chunk." |
+| **Hybrid** | 0.82, 0.79, 0.50 | "Both signals agree on the top chunks — they fuse to produce the cleanest ranking." |
+
+> **Bonus**: Run `"OCI hands-on cloud deployment exercise"` for an even more extreme gap — BM25 scores **14.37** vs vector's **0.49** (30x difference).

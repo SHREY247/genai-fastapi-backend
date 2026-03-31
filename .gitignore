@@ -33,3 +33,12 @@ Thumbs.db
 
 # Logs
 *.log
+
+# Archives and build artifacts
+*.zip
+
+# Session walkthrough and script files (instructor-only content)
+SESSION_*_SCRIPT.md
+SESSION_*_WALKTHROUGH.md
+WALKTHROUGH.md
+*_WALKTHROUGH.md
