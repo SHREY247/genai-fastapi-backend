@@ -57,76 +57,53 @@ Session 10 (retrieval)          Session 11 (evaluation)
 
 ---
 
-## Quick Start
+## Quick Start & Classroom Flow
 
-### 1. Install Dependencies
+We recommend running the following checks/demos in this exact order during class:
 
+### 1. Observability (Retrieval-Only)
+Fastest demo. Shows the pipeline chunks and prompt without waiting for an LLM:
 ```bash
-pip install ragas datasets
+python -m app.rag.session11.playground --observe --no-answers
 ```
+*Checks: retrieved chunks appear, prompt preview appears, answer says "RETRIEVAL-ONLY MODE".*
 
-> **Note:** RAGAS is optional. All Session 11 code works without it,
-> falling back to basic keyword-overlap metrics. RAGAS adds LLM-based
-> evaluation for answer relevancy, faithfulness, context precision, and recall.
-
-### 2. Observability Demo (Mode A)
-
-See every step of the RAG pipeline for a single query:
-
+### 2. Observability (With LLM Answer)
+Same as above, but completes the final step:
 ```bash
 python -m app.rag.session11.playground --observe
 ```
+*Checks: pipeline executes fully, final output matches chunks.*
 
-Output shows:
-- Original and rewritten query
-- Strategy used
-- Retrieved chunks with scores and sources
-- Prompt preview
-- LLM answer
-- Timing breakdown
-
-### 3. Comparison Demo (Mode B)
-
-Compare all 5 strategies on the same query:
-
+### 3. Strategy Comparison (Retrieval-Only)
+Run all 5 strategies on the same query to compare retrieval and rewrite behaviour without heavy LLM latency:
 ```bash
-python -m app.rag.session11.playground --compare
+python -m app.rag.session11.playground --compare --no-answers
 ```
+*Checks: all strategies run, comparison table prints cleanly.*
 
-Output shows per-strategy:
-- Top retrieved chunks
-- Answer preview
-- Timing comparison table
-
-### 4. Full Evaluation (Mode C)
-
-Run all strategies on the eval dataset and see a score table:
-
+### 4. Full Evaluation
+Run all strategies across the full 10-question evaluation dataset to see the final quantitative score table:
 ```bash
-# Basic evaluation (no RAGAS required)
 python -m app.rag.session11.playground --eval
+```
+*Checks: basic evaluation completes.*
 
-# With RAGAS metrics (requires ragas package)
+### 5. RAGAS Evaluation (Optional)
+If the environment is stable and `ragas` + `datasets` are installed:
+```bash
 python -m app.rag.session11.playground --eval --ragas
 ```
 
-### 5. Interactive Mode (Mode D)
+---
+
+### Interactive Mode (Mode D)
 
 ```bash
 python -m app.rag.session11.playground --interactive
 ```
 
 Type queries to see comparison results. Prefix with `debug:` for full observability output.
-
-### 6. Combined Modes
-
-```bash
-# Run observability + comparison (default)
-python -m app.rag.session11.playground
-
-# Run everything
-python -m app.rag.session11.playground --observe --compare --eval
-```
 
 ---
 
@@ -226,8 +203,9 @@ Questions are designed to cover different retrieval challenges:
 
 ## Teaching Flow Suggestion
 
-1. **Start with observability** (`--observe`) — show students what's happening inside the pipeline
-2. **Compare strategies** (`--compare`) — show that different strategies give different results
-3. **Introduce evaluation** (`--eval`) — show that we can measure quality systematically
-4. **Discuss metrics** — what does each metric tell us? What are the limitations?
-5. **Key takeaway**: RAG outputs cannot be trusted blindly. Measurement turns optimization into engineering.
+1. **Start with observability (no-answers)** — show students what's happening inside the pipeline first, avoiding LLM wait times.
+2. **Show full observability** — turn on the LLM to prove the pipeline connects end-to-end.
+3. **Compare strategies (no-answers)** — show that different strategies retrieve different chunks for the same question.
+4. **Introduce evaluation** — show that we can measure quality systematically over a dataset.
+5. **Discuss metrics** — what does each metric tell us? What are the limitations?
+6. **Key takeaway**: RAG outputs cannot be trusted blindly. Measurement turns optimization into engineering.
