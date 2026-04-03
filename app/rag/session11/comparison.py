@@ -230,8 +230,8 @@ def compare_on_dataset(
             )
             strategy_scores.append(score)
             
-            # Anti-rate-limit backoff for Free Tier APIs (Groq)
-            time.sleep(2.0)
+            # Anti-rate-limit backoff for Free Tier APIs (Groq: ~30 req/min)
+            time.sleep(5.0)
 
         # Average scores
         avg_scores = _average_scores(strategy_scores)

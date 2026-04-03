@@ -49,7 +49,12 @@ class GroqProvider(BaseLLMProvider):
             logger.error("Groq API request timed out")
             raise HTTPException(status_code=504, detail="Groq API request timed out.")
         except requests.RequestException as e:
-            logger.error(f"Groq API error: {str(e)}")
+            # Downgrade 429 rate-limit hits to WARNING — they are expected on
+            # the Free Tier and do not represent a code bug.
+            if hasattr(e, "response") and e.response is not None and e.response.status_code == 429:
+                logger.warning(f"Groq rate limit hit (429) — retrying next call: {str(e)}")
+            else:
+                logger.error(f"Groq API error: {str(e)}")
             raise HTTPException(status_code=502, detail=f"Groq API error: {str(e)}")
 
         data = response.json()
