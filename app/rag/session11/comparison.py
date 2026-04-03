@@ -27,6 +27,7 @@ Usage:
 """
 
 from typing import Dict, List, Optional
+import time
 
 from app.rag.session11.observability import (
     run_strategy,
@@ -177,6 +178,9 @@ def compare_on_dataset(
 
     if eval_dataset is None:
         eval_dataset = load_eval_dataset()
+        # FIX FOR GROQ RATE LIMITS: Slice the dataset to first 3 questions
+        # to avoid 429 Too Many Requests on free tier during class demo.
+        eval_dataset = eval_dataset[:3]
 
     pipe = pipeline or get_pipeline()
 
@@ -225,6 +229,9 @@ def compare_on_dataset(
                 expected_sources=item.get("expected_sources"),
             )
             strategy_scores.append(score)
+            
+            # Anti-rate-limit backoff for Free Tier APIs (Groq)
+            time.sleep(2.0)
 
         # Average scores
         avg_scores = _average_scores(strategy_scores)
