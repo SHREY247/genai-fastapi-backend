@@ -36,8 +36,9 @@ Examples:
     # Interactive mode
     python -m app.rag.session11.playground --interactive
 
-    # Skip LLM calls (faster, retrieval-only)
+    # Skip LLM calls (retrieval-only — fast classroom demo)
     python -m app.rag.session11.playground --compare --no-answers
+    python -m app.rag.session11.playground --observe --no-answers
 """
 
 import sys
@@ -79,18 +80,20 @@ DEMO_QUERIES = [
 # Mode A: Observability Demo
 # ---------------------------------------------------------------------------
 
-def demo_observability(pipeline, strategy: str = HYBRID, query: str = None):
+def demo_observability(pipeline, strategy: str = HYBRID, query: str = None, generate_answer: bool = True):
     """
     Demonstrates the observability layer by running a single strategy
     with full debug output.
 
     Shows students every stage of the RAG pipeline.
+    Pass generate_answer=False to skip the LLM call (faster, retrieval-only).
     """
     if query is None:
         query = DEMO_QUERIES[0]
 
+    mode_label = "RETRIEVAL ONLY" if not generate_answer else "with LLM answer"
     print(f"\n{'#'*70}")
-    print(f"#  MODE A: OBSERVABILITY DEMO")
+    print(f"#  MODE A: OBSERVABILITY DEMO  ({mode_label})")
     print(f"#  Strategy: {strategy}")
     print(f"#  Query: \"{query}\"")
     print(f"{'#'*70}")
@@ -100,7 +103,8 @@ def demo_observability(pipeline, strategy: str = HYBRID, query: str = None):
         query=query,
         pipeline=pipeline,
         top_k=5,
-        debug=True,  # This triggers the full debug report
+        debug=True,          # triggers the full debug report
+        generate_answer=generate_answer,
     )
 
     return result
@@ -110,12 +114,13 @@ def demo_observability(pipeline, strategy: str = HYBRID, query: str = None):
 # Mode B: Comparison Demo
 # ---------------------------------------------------------------------------
 
-def demo_comparison(pipeline, query: str = None, strategies=None):
+def demo_comparison(pipeline, query: str = None, strategies=None, generate_answer: bool = True):
     """
     Demonstrates cross-strategy comparison on a single query.
 
     Shows students how the same question gets different results
     from different retrieval strategies.
+    Pass generate_answer=False to skip LLM calls (fast, retrieval-focused demo).
     """
     if query is None:
         query = DEMO_QUERIES[0]
@@ -135,7 +140,8 @@ def demo_comparison(pipeline, query: str = None, strategies=None):
         pipeline=pipeline,
         top_k=5,
         show_chunks=True,
-        show_answers=True,
+        show_answers=generate_answer,
+        generate_answer=generate_answer,
     )
 
     return results
@@ -233,11 +239,12 @@ def main():
     """
     args = set(sys.argv[1:])
 
-    run_observe = "--observe" in args
-    run_compare = "--compare" in args
-    run_eval = "--eval" in args
-    run_interactive = "--interactive" in args
-    use_ragas = "--ragas" in args
+    run_observe    = "--observe"     in args
+    run_compare    = "--compare"     in args
+    run_eval       = "--eval"        in args
+    run_interactive= "--interactive" in args
+    use_ragas      = "--ragas"       in args
+    generate_answer= "--no-answers" not in args  # False when --no-answers passed
 
     # Default: run observability + comparison demos
     if not any([run_observe, run_compare, run_eval, run_interactive]):
@@ -246,6 +253,8 @@ def main():
 
     print(f"\n{'#'*70}")
     print(f"#  SESSION 11: RAG EVALUATION & OBSERVABILITY — PLAYGROUND")
+    if not generate_answer:
+        print(f"#  Mode: RETRIEVAL ONLY (--no-answers)  — LLM calls skipped")
     print(f"{'#'*70}")
     print(f"\nBuilding pipeline (one-time setup)...\n")
 
@@ -261,22 +270,22 @@ def main():
 
     # Run selected modes
     if run_observe:
-        demo_observability(pipeline)
+        demo_observability(pipeline, generate_answer=generate_answer)
 
         # Also show rewrite comparison
         print(f"\n{'─'*70}")
         print("  Now showing the same query with REWRITE + HYBRID...")
         print(f"{'─'*70}")
-        demo_observability(pipeline, strategy=REWRITE_HYBRID)
+        demo_observability(pipeline, strategy=REWRITE_HYBRID, generate_answer=generate_answer)
 
     if run_compare:
-        demo_comparison(pipeline)
+        demo_comparison(pipeline, generate_answer=generate_answer)
 
         # Try a second query to show variety
         print(f"\n{'─'*70}")
         print("  Second comparison query...")
         print(f"{'─'*70}")
-        demo_comparison(pipeline, query=DEMO_QUERIES[2])
+        demo_comparison(pipeline, query=DEMO_QUERIES[2], generate_answer=generate_answer)
 
     if run_eval:
         demo_evaluation(pipeline, use_ragas=use_ragas)

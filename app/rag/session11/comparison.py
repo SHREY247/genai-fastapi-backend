@@ -55,6 +55,7 @@ def compare_single_query(
     top_k: int = 5,
     show_chunks: bool = True,
     show_answers: bool = True,
+    generate_answer: bool = True,
     max_chunk_chars: int = 150,
     max_answer_chars: int = 300,
 ) -> List[Dict]:
@@ -71,6 +72,8 @@ def compare_single_query(
         top_k:            chunks per strategy.
         show_chunks:      if True, shows top retrieved chunks per strategy.
         show_answers:     if True, shows LLM answers per strategy.
+        generate_answer:  if False, skips LLM generation for all strategies.
+                          Overrides show_answers when False.
         max_chunk_chars:  max characters per chunk preview.
         max_answer_chars: max characters for answer preview.
 
@@ -80,10 +83,15 @@ def compare_single_query(
     if strategies is None:
         strategies = ALL_STRATEGIES
 
+    # generate_answer=False implies no answers to show
+    if not generate_answer:
+        show_answers = False
+
     pipe = pipeline or get_pipeline()
 
+    mode_label = "RETRIEVAL ONLY" if not generate_answer else "with LLM answers"
     print(f"\n{THICK_SEPARATOR}")
-    print(f"  📊 SINGLE-QUERY COMPARISON")
+    print(f"  📊 SINGLE-QUERY COMPARISON  ({mode_label})")
     print(f"  Query: \"{query}\"")
     print(f"  Strategies: {', '.join(strategies)}")
     print(THICK_SEPARATOR)
@@ -96,6 +104,7 @@ def compare_single_query(
             pipeline=pipe,
             top_k=top_k,
             debug=False,
+            generate_answer=generate_answer,
         )
         results.append(result)
 
@@ -113,16 +122,20 @@ def compare_single_query(
         if show_chunks:
             chunks = result.get("contexts", [])[:3]
             for i, chunk in enumerate(chunks, start=1):
+                rank   = chunk.get("rank", i)
                 source = chunk.get("source", "?")
-                score = chunk.get("score", 0.0)
-                text = truncate(chunk.get("text", ""), max_chunk_chars)
-                print(f"    [{i}] {source} (score={score:.4f})")
-                print(f"        {text}")
+                score  = chunk.get("score", 0.0)
+                text   = truncate(chunk.get("text", ""), max_chunk_chars)
+                print(f"    Rank {rank}  {source}  (score={score:.4f})")
+                print(f"    {'─'*62}")
+                print(f"    {text}")
 
-        # Show answer
+        # Show answer or retrieval-only notice
         if show_answers:
             answer = result.get("answer", "")
             print(f"\n  Answer: {truncate(answer, max_answer_chars)}")
+        elif not generate_answer:
+            print("\n  [RETRIEVAL ONLY — answer generation skipped]")
 
     # Print timing comparison
     print_comparison_table(results)

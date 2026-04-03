@@ -131,6 +131,7 @@ class Session10Pipeline:
         strategy: str = "hybrid",
         rewrite: bool = False,
         top_k: int = 5,
+        generate_answer: bool = True,
     ) -> Dict:
         """
         Runs a single query through the selected retrieval strategy.
@@ -139,10 +140,13 @@ class Session10Pipeline:
         can show WHERE latency comes from.
 
         Args:
-            query:     the user's question.
-            strategy:  one of "vector", "bm25", "hybrid".
-            rewrite:   if True, rewrites the query before retrieval.
-            top_k:     number of chunks to retrieve.
+            query:            the user's question.
+            strategy:         one of "vector", "bm25", "hybrid".
+            rewrite:          if True, rewrites the query before retrieval.
+            top_k:            number of chunks to retrieve.
+            generate_answer:  if False, skips the LLM call and returns an
+                              empty answer. Retrieval and prompt construction
+                              still run. Useful for fast classroom demos.
 
         Returns:
             Dict with keys:
@@ -151,7 +155,9 @@ class Session10Pipeline:
                 strategy         -- strategy name used
                 results          -- list of retrieved chunk dicts
                 context          -- formatted context string
-                answer           -- LLM-generated answer
+                prompt           -- the final prompt sent (or built) for the LLM
+                answer           -- LLM-generated answer (empty string if
+                                   generate_answer=False)
                 timing_ms        -- dict with rewrite_ms, retrieval_ms,
                                     answer_ms, total_ms
         """
@@ -179,16 +185,20 @@ class Session10Pipeline:
         results = retriever.retrieve(effective_query, top_k=top_k)
         timing["retrieval_ms"] = (time.time() - t0) * 1000
 
-        # ---- Phase 3: Context building + LLM answer ----
+        # ---- Phase 3: Context building ----
         context = build_interview_context(results)
         prompt = build_interview_prompt(query, context)
 
+        # ---- Phase 4: Optional LLM answer generation ----
         t0 = time.time()
-        try:
-            from app.services.llm_service import ask_llm
-            answer = ask_llm(self.provider, prompt)
-        except Exception as e:
-            answer = f"[LLM call failed: {e}]"
+        if generate_answer:
+            try:
+                from app.services.llm_service import ask_llm
+                answer = ask_llm(self.provider, prompt)
+            except Exception as e:
+                answer = f"[LLM call failed: {e}]"
+        else:
+            answer = ""
         timing["answer_ms"] = (time.time() - t0) * 1000
 
         timing["total_ms"] = (time.time() - t_total_start) * 1000
@@ -199,6 +209,7 @@ class Session10Pipeline:
             "strategy": strategy,
             "results": results,
             "context": context,
+            "prompt": prompt,          # the actual final prompt sent to the LLM
             "answer": answer,
             "timing_ms": timing,
         }

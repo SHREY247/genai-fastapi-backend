@@ -97,6 +97,7 @@ def run_strategy(
     pipeline: Optional[Session10Pipeline] = None,
     top_k: int = 5,
     debug: bool = False,
+    generate_answer: bool = True,
 ) -> Dict:
     """
     Runs a single query through the specified retrieval strategy and
@@ -106,12 +107,14 @@ def run_strategy(
     comparison, and demo code calls this function.
 
     Args:
-        strategy_name: one of VECTOR, BM25, HYBRID, REWRITE_VECTOR, REWRITE_HYBRID.
-        query:         the user's question.
-        pipeline:      optional pre-built Session10Pipeline. If None, uses
-                       the shared singleton.
-        top_k:         number of chunks to retrieve.
-        debug:         if True, prints a full debug report to terminal.
+        strategy_name:   one of VECTOR, BM25, HYBRID, REWRITE_VECTOR, REWRITE_HYBRID.
+        query:           the user's question.
+        pipeline:        optional pre-built Session10Pipeline. If None, uses
+                         the shared singleton.
+        top_k:           number of chunks to retrieve.
+        debug:           if True, prints a full debug report to terminal.
+        generate_answer: if False, skips LLM generation. Retrieval and prompt
+                         construction still run. Default True.
 
     Returns:
         Dict with keys:
@@ -120,8 +123,8 @@ def run_strategy(
             strategy         — strategy name used
             contexts         — list of retrieved chunk dicts
             context_metadata — list of metadata dicts for each chunk
-            prompt           — the full prompt sent to the LLM
-            answer           — the LLM-generated answer
+            prompt           — the final prompt sent to the LLM
+            answer           — the LLM-generated answer (empty if generate_answer=False)
             timing_ms        — dict with rewrite_ms, retrieval_ms,
                                answer_ms, total_ms
 
@@ -145,6 +148,7 @@ def run_strategy(
         strategy=base_strategy,
         rewrite=use_rewrite,
         top_k=top_k,
+        generate_answer=generate_answer,
     )
 
     # Extract metadata from each chunk
@@ -161,15 +165,18 @@ def run_strategy(
         })
 
     # Build normalized result
+    # NOTE: raw["prompt"] is the actual final LLM prompt (fixed from earlier
+    # version that incorrectly mapped this to raw["context"]).
     result = {
         "query": raw["query"],
         "rewritten_query": raw.get("rewritten_query"),
         "strategy": strategy_name,
         "contexts": raw.get("results", []),
         "context_metadata": context_metadata,
-        "prompt": raw.get("context", ""),  # the assembled context string
+        "prompt": raw.get("prompt", ""),   # the real final prompt sent to the LLM
         "answer": raw.get("answer", ""),
         "timing_ms": raw.get("timing_ms", {}),
+        "retrieval_only": not generate_answer,
     }
 
     # Optional: print debug report
@@ -185,6 +192,7 @@ def run_all_strategies(
     pipeline: Optional[Session10Pipeline] = None,
     top_k: int = 5,
     debug: bool = False,
+    generate_answer: bool = True,
 ) -> List[Dict]:
     """
     Runs a query through multiple strategies and returns all results.
@@ -192,11 +200,12 @@ def run_all_strategies(
     Convenience wrapper over run_strategy() for batch evaluation.
 
     Args:
-        query:      the user's question.
-        strategies: list of strategy names. Defaults to ALL_STRATEGIES.
-        pipeline:   optional pre-built pipeline.
-        top_k:      chunks per strategy.
-        debug:      if True, prints debug report for each strategy.
+        query:           the user's question.
+        strategies:      list of strategy names. Defaults to ALL_STRATEGIES.
+        pipeline:        optional pre-built pipeline.
+        top_k:           chunks per strategy.
+        debug:           if True, prints debug report for each strategy.
+        generate_answer: if False, skips LLM generation for all strategies.
 
     Returns:
         List of result dicts (one per strategy), in the same order.
@@ -212,6 +221,7 @@ def run_all_strategies(
             pipeline=pipeline,
             top_k=top_k,
             debug=debug,
+            generate_answer=generate_answer,
         )
         results.append(result)
 

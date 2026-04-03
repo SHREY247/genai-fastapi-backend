@@ -111,52 +111,82 @@ def print_chunks_section(
     max_text_chars: int = 200,
 ) -> None:
     """
-    Prints the RETRIEVED CHUNKS section with rank, source, and text preview.
+    Prints the RETRIEVED CHUNKS section with rank, source, score, and text.
+
+    Design: each chunk is a clearly delineated block so it reads naturally
+    on a projector. Rank, source, and score are on one line; text on the next.
 
     Args:
         results:        list of chunk dicts from retrieval.
         max_chunks:     maximum number of chunks to display.
         max_text_chars: maximum characters per chunk text preview.
     """
-    _print_header(f"📦 RETRIEVED CHUNKS ({len(results)} total)")
+    _print_header(f"📦 RETRIEVED CHUNKS  ({len(results)} returned, showing {min(len(results), max_chunks)})")
 
     display = results[:max_chunks]
     for i, chunk in enumerate(display, start=1):
+        rank   = chunk.get("rank", i)
         source = chunk.get("source", "unknown")
-        chunk_id = chunk.get("chunk_id", "?")
-        score = chunk.get("score", 0.0)
-        retriever = chunk.get("retriever", "?")
-        text = truncate(chunk.get("text", ""), max_text_chars)
+        score  = chunk.get("score", 0.0)
+        via    = chunk.get("retriever", "?")
+        text   = truncate(chunk.get("text", ""), max_text_chars)
 
-        print(f"\n  [{i}] {source} | chunk={chunk_id} | score={score:.4f} | via={retriever}")
-        print(f"      {text}")
+        # One header line, one text line — easy to read on a projector
+        print(f"\n  Rank {rank}  |  {source}  |  score={score:.4f}  |  via {via}")
+        print(f"  {'─'*66}")
+        print(f"  {text}")
 
     if len(results) > max_chunks:
-        print(f"\n  ... ({len(results) - max_chunks} more chunks not shown)")
+        remaining = len(results) - max_chunks
+        print(f"\n  ... {remaining} more chunk(s) not shown (increase max_chunks to see them)")
 
 
-def print_prompt_section(prompt: str, max_chars: int = 500) -> None:
+def print_prompt_section(prompt: str, max_chars: int = 600) -> None:
     """
-    Prints the PROMPT PREVIEW section with truncation.
+    Prints the PROMPT PREVIEW section with clean truncation.
+
+    Shows the actual final prompt sent to the LLM. Long prompts are
+    truncated with a clear indicator of how much was cut.
 
     Args:
         prompt:    the full prompt sent to the LLM.
-        max_chars: maximum characters to display.
+        max_chars: maximum characters to display (default 600 ~= ~10 lines).
     """
-    _print_header("📋 PROMPT PREVIEW")
-    print(truncate_lines(prompt, max_lines=15))
+    _print_header("📋 FINAL PROMPT  (sent to LLM)")
+    if not prompt:
+        print("  (no prompt — retrieval-only mode)")
+        return
+
+    lines = prompt.split("\n")
+    char_count = 0
+    output_lines = []
+    for line in lines:
+        if char_count + len(line) > max_chars:
+            output_lines.append(f"  ... [{len(prompt) - max_chars}+ chars truncated — full prompt has {len(prompt)} chars]")
+            break
+        output_lines.append(line)
+        char_count += len(line) + 1
+
+    print("\n".join(output_lines))
 
 
-def print_answer_section(answer: str, max_chars: int = 500) -> None:
+def print_answer_section(answer: str, retrieval_only: bool = False, max_chars: int = 500) -> None:
     """
     Prints the ANSWER section.
 
     Args:
-        answer:    the LLM-generated answer.
-        max_chars: maximum characters to display.
+        answer:         the LLM-generated answer.
+        retrieval_only: if True, shows a notice instead of an empty answer.
+        max_chars:      maximum characters to display.
     """
     _print_header("💬 ANSWER")
-    print(f"  {truncate(answer, max_chars)}")
+    if retrieval_only:
+        print("  [RETRIEVAL-ONLY MODE — LLM generation was skipped]")
+        print("  Run without --no-answers to see the generated answer.")
+    elif not answer or answer.isspace():
+        print("  (no answer returned)")
+    else:
+        print(f"  {truncate(answer, max_chars)}")
 
 
 def print_timing_section(timing: Dict) -> None:
@@ -229,10 +259,15 @@ def print_debug_report(result: Dict, verbose: bool = True) -> None:
     if verbose:
         print_metadata_section(result.get("contexts", []))
 
-    if verbose and result.get("prompt"):
+    if result.get("prompt"):
         print_prompt_section(result["prompt"])
+    elif verbose:
+        print_prompt_section("")  # shows the retrieval-only notice
 
-    print_answer_section(result.get("answer", "(no answer)"))
+    print_answer_section(
+        result.get("answer", ""),
+        retrieval_only=result.get("retrieval_only", False),
+    )
 
     if result.get("timing_ms"):
         print_timing_section(result["timing_ms"])

@@ -21,7 +21,8 @@ langchain-groq
 rank-bm25
 
 # Session 11: RAG Evaluation & Observability
-# Note: ragas and datasets are optional — Session 11 code works without them,
-# falling back to basic evaluation metrics. Install for full RAGAS support.
-ragas
-datasets
+# ragas and datasets are OPTIONAL — all Session 11 code (observability,
+# comparison, basic metrics) works without them. Only RAGAS metric evaluation
+# requires these packages. Pinned ranges tested with this codebase.
+ragas>=0.1.0,<0.3
+datasets>=2.14,<4
