@@ -151,15 +151,18 @@ def demo_comparison(pipeline, query: str = None, strategies=None, generate_answe
 # Mode C: Evaluation Demo
 # ---------------------------------------------------------------------------
 
-def demo_evaluation(pipeline, use_ragas: bool = False):
+def demo_evaluation(pipeline, use_ragas: bool = False, generate_answer: bool = True):
     """
     Demonstrates the evaluation pipeline on the full eval dataset.
 
     Runs all strategies, scores them, and prints a comparison table.
+    Pass generate_answer=False to skip all LLM calls — only Source Coverage
+    and Context Hit Rate are scored. Useful when Groq is rate-limited.
     """
+    mode_label = "RETRIEVAL-ONLY metrics" if not generate_answer else "Basic metrics"
     print(f"\n{'#'*70}")
     print(f"#  MODE C: EVALUATION DEMO")
-    print(f"#  Method: {'RAGAS' if use_ragas else 'Basic metrics'}")
+    print(f"#  Method: {'RAGAS' if use_ragas else mode_label}")
     print(f"{'#'*70}")
 
     # Show the dataset first
@@ -169,6 +172,7 @@ def demo_evaluation(pipeline, use_ragas: bool = False):
     results = compare_on_dataset(
         pipeline=pipeline,
         use_ragas=use_ragas,
+        generate_answer=generate_answer,
     )
 
     return results
@@ -288,7 +292,7 @@ def main():
         demo_comparison(pipeline, query=DEMO_QUERIES[2], generate_answer=generate_answer)
 
     if run_eval:
-        demo_evaluation(pipeline, use_ragas=use_ragas)
+        demo_evaluation(pipeline, use_ragas=use_ragas, generate_answer=generate_answer)
 
     if run_interactive:
         demo_interactive(pipeline)

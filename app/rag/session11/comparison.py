@@ -154,6 +154,7 @@ def compare_on_dataset(
     pipeline=None,
     top_k: int = 5,
     use_ragas: bool = False,
+    generate_answer: bool = True,
 ) -> Dict:
     """
     Compares strategies across the full evaluation dataset.
@@ -162,11 +163,14 @@ def compare_on_dataset(
     and prints a summary table.
 
     Args:
-        strategies:   list of strategy names. Defaults to ALL_STRATEGIES.
-        eval_dataset: optional eval items. Loaded from file if None.
-        pipeline:     optional pre-built pipeline.
-        top_k:        chunks per strategy.
-        use_ragas:    if True, uses RAGAS for evaluation (requires ragas package).
+        strategies:     list of strategy names. Defaults to ALL_STRATEGIES.
+        eval_dataset:   optional eval items. Loaded from file if None.
+        pipeline:       optional pre-built pipeline.
+        top_k:          chunks per strategy.
+        use_ragas:      if True, uses RAGAS for evaluation (requires ragas package).
+        generate_answer: if False, skips LLM calls entirely. Only source coverage
+                        and context hit rate are scored (no answer_presence).
+                        Use with --no-answers for a fully API-key-free class demo.
 
     Returns:
         Dict keyed by strategy name, each containing:
@@ -184,8 +188,9 @@ def compare_on_dataset(
 
     pipe = pipeline or get_pipeline()
 
+    mode_label = "RETRIEVAL ONLY (Source Coverage + Context Hit Rate)" if not generate_answer else "with LLM answers (all metrics)"
     print(f"\n{'#'*70}")
-    print(f"  DATASET COMPARISON")
+    print(f"  DATASET COMPARISON  — {mode_label}")
     print(f"  Strategies: {', '.join(strategies)}")
     print(f"  Questions:  {len(eval_dataset)}")
     print(f"{'#'*70}\n")
@@ -220,18 +225,28 @@ def compare_on_dataset(
                 pipeline=pipe,
                 top_k=top_k,
                 debug=False,
+                generate_answer=generate_answer,
             )
             strategy_results.append(result)
 
-            score = evaluate_single(
-                result=result,
-                ground_truth=item["ground_truth"],
-                expected_sources=item.get("expected_sources"),
-            )
+            if generate_answer:
+                score = evaluate_single(
+                    result=result,
+                    ground_truth=item["ground_truth"],
+                    expected_sources=item.get("expected_sources"),
+                )
+                # Anti-rate-limit backoff for Free Tier APIs (Groq: ~30 req/min)
+                time.sleep(5.0)
+            else:
+                # No LLM answer — only score retrieval-quality metrics
+                score = {
+                    "answer_presence": None,
+                    "source_coverage": _score_source_coverage_only(result, item.get("expected_sources")),
+                    "context_hit_rate": _score_context_hit_rate_only(result, item.get("expected_sources")),
+                }
+                valid = [v for v in score.values() if v is not None]
+                score["overall"] = sum(valid) / len(valid) if valid else 0.0
             strategy_scores.append(score)
-            
-            # Anti-rate-limit backoff for Free Tier APIs (Groq: ~30 req/min)
-            time.sleep(5.0)
 
         # Average scores
         avg_scores = _average_scores(strategy_scores)
@@ -248,6 +263,25 @@ def compare_on_dataset(
     _print_dataset_comparison_table(all_strategy_results)
 
     return all_strategy_results
+
+
+def _score_source_coverage_only(result: Dict, expected_sources: Optional[List[str]]) -> Optional[float]:
+    """Source coverage check using context_metadata from a run_strategy result."""
+    if not expected_sources:
+        return None
+    metadata = result.get("context_metadata", result.get("contexts", []))
+    retrieved = {m.get("source", "") for m in metadata}
+    hits = sum(1 for src in expected_sources if any(src in rs for rs in retrieved))
+    return hits / len(expected_sources)
+
+
+def _score_context_hit_rate_only(result: Dict, expected_sources: Optional[List[str]]) -> Optional[float]:
+    """Context hit rate check using contexts from a run_strategy result."""
+    contexts = result.get("contexts", [])
+    if not contexts or not expected_sources:
+        return None
+    hits = sum(1 for c in contexts if any(src in c.get("source", "") for src in expected_sources))
+    return hits / len(contexts)
 
 
 def _average_scores(scores: List[Dict]) -> Dict:
