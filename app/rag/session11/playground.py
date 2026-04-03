@@ -1,0 +1,293 @@
+"""
+session11/playground.py
+------------------------
+Classroom demo entry point for Session 11: RAG Evaluation & Observability.
+
+Run with:
+    python -m app.rag.session11.playground
+
+Supports two demo modes:
+
+    Mode A: Observability Demo (--observe)
+        Runs one strategy on one query with full debug output.
+        Shows every stage: query → rewrite → retrieval → prompt → answer.
+
+    Mode B: Comparison Demo (--compare)
+        Runs multiple strategies on the same query and prints
+        side-by-side results with timing and chunk comparisons.
+
+    Mode C: Evaluation Demo (--eval)
+        Runs the evaluation dataset through all strategies and prints
+        a final score comparison table.
+
+    Mode D: Interactive Mode (--interactive)
+        Lets the instructor type queries and see results live.
+
+Examples:
+    # Observability demo with debug output
+    python -m app.rag.session11.playground --observe
+
+    # Compare strategies on a demo query
+    python -m app.rag.session11.playground --compare
+
+    # Run full evaluation
+    python -m app.rag.session11.playground --eval
+
+    # Interactive mode
+    python -m app.rag.session11.playground --interactive
+
+    # Skip LLM calls (faster, retrieval-only)
+    python -m app.rag.session11.playground --compare --no-answers
+"""
+
+import sys
+import time
+
+from app.rag.session11.observability import (
+    run_strategy,
+    run_all_strategies,
+    get_pipeline,
+    ALL_STRATEGIES,
+    VECTOR,
+    BM25,
+    HYBRID,
+    REWRITE_VECTOR,
+    REWRITE_HYBRID,
+)
+from app.rag.session11.debug_logger import (
+    print_debug_report,
+    print_comparison_table,
+    THICK_SEPARATOR,
+)
+from app.rag.session11.comparison import compare_single_query, compare_on_dataset
+from app.rag.session11.dataset import load_eval_dataset, print_dataset_summary
+
+
+# ---------------------------------------------------------------------------
+# Demo queries
+# ---------------------------------------------------------------------------
+
+DEMO_QUERIES = [
+    "What are the interview rounds at Amazon for an SDE role?",
+    "How should I prepare for a coding assessment?",
+    "Tell me about the rounds",
+    "Oracle OCI cloud interview questions",
+]
+
+
+# ---------------------------------------------------------------------------
+# Mode A: Observability Demo
+# ---------------------------------------------------------------------------
+
+def demo_observability(pipeline, strategy: str = HYBRID, query: str = None):
+    """
+    Demonstrates the observability layer by running a single strategy
+    with full debug output.
+
+    Shows students every stage of the RAG pipeline.
+    """
+    if query is None:
+        query = DEMO_QUERIES[0]
+
+    print(f"\n{'#'*70}")
+    print(f"#  MODE A: OBSERVABILITY DEMO")
+    print(f"#  Strategy: {strategy}")
+    print(f"#  Query: \"{query}\"")
+    print(f"{'#'*70}")
+
+    result = run_strategy(
+        strategy_name=strategy,
+        query=query,
+        pipeline=pipeline,
+        top_k=5,
+        debug=True,  # This triggers the full debug report
+    )
+
+    return result
+
+
+# ---------------------------------------------------------------------------
+# Mode B: Comparison Demo
+# ---------------------------------------------------------------------------
+
+def demo_comparison(pipeline, query: str = None, strategies=None):
+    """
+    Demonstrates cross-strategy comparison on a single query.
+
+    Shows students how the same question gets different results
+    from different retrieval strategies.
+    """
+    if query is None:
+        query = DEMO_QUERIES[0]
+
+    if strategies is None:
+        strategies = ALL_STRATEGIES
+
+    print(f"\n{'#'*70}")
+    print(f"#  MODE B: COMPARISON DEMO")
+    print(f"#  Query: \"{query}\"")
+    print(f"#  Strategies: {', '.join(strategies)}")
+    print(f"{'#'*70}")
+
+    results = compare_single_query(
+        query=query,
+        strategies=strategies,
+        pipeline=pipeline,
+        top_k=5,
+        show_chunks=True,
+        show_answers=True,
+    )
+
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Mode C: Evaluation Demo
+# ---------------------------------------------------------------------------
+
+def demo_evaluation(pipeline, use_ragas: bool = False):
+    """
+    Demonstrates the evaluation pipeline on the full eval dataset.
+
+    Runs all strategies, scores them, and prints a comparison table.
+    """
+    print(f"\n{'#'*70}")
+    print(f"#  MODE C: EVALUATION DEMO")
+    print(f"#  Method: {'RAGAS' if use_ragas else 'Basic metrics'}")
+    print(f"{'#'*70}")
+
+    # Show the dataset first
+    print_dataset_summary()
+
+    # Run comparison
+    results = compare_on_dataset(
+        pipeline=pipeline,
+        use_ragas=use_ragas,
+    )
+
+    return results
+
+
+# ---------------------------------------------------------------------------
+# Mode D: Interactive
+# ---------------------------------------------------------------------------
+
+def demo_interactive(pipeline):
+    """
+    Interactive mode for live classroom demos.
+
+    The instructor types a query, picks a mode, and sees results.
+    """
+    print(f"\n{'#'*70}")
+    print(f"#  MODE D: INTERACTIVE")
+    print(f"#  Commands:")
+    print(f"#    Type a query to run comparison across all strategies")
+    print(f"#    Prefix with 'debug:' for full observability output")
+    print(f"#    Type 'quit' or 'exit' to stop")
+    print(f"{'#'*70}")
+
+    while True:
+        try:
+            raw_input = input("\n▸ Enter query: ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\nExiting.")
+            break
+
+        if not raw_input or raw_input.lower() in ("quit", "exit", "q"):
+            print("Exiting.")
+            break
+
+        if raw_input.lower().startswith("debug:"):
+            # Observability mode
+            query = raw_input[6:].strip()
+            if not query:
+                print("  Please provide a query after 'debug:'")
+                continue
+
+            for strategy in ALL_STRATEGIES:
+                run_strategy(
+                    strategy_name=strategy,
+                    query=query,
+                    pipeline=pipeline,
+                    top_k=5,
+                    debug=True,
+                )
+        else:
+            # Comparison mode
+            compare_single_query(
+                query=raw_input,
+                pipeline=pipeline,
+                top_k=5,
+            )
+
+
+# ---------------------------------------------------------------------------
+# Main
+# ---------------------------------------------------------------------------
+
+def main():
+    """
+    Entry point for the Session 11 playground.
+
+    Parse CLI flags and run the appropriate demo mode.
+    """
+    args = set(sys.argv[1:])
+
+    run_observe = "--observe" in args
+    run_compare = "--compare" in args
+    run_eval = "--eval" in args
+    run_interactive = "--interactive" in args
+    use_ragas = "--ragas" in args
+
+    # Default: run observability + comparison demos
+    if not any([run_observe, run_compare, run_eval, run_interactive]):
+        run_observe = True
+        run_compare = True
+
+    print(f"\n{'#'*70}")
+    print(f"#  SESSION 11: RAG EVALUATION & OBSERVABILITY — PLAYGROUND")
+    print(f"{'#'*70}")
+    print(f"\nBuilding pipeline (one-time setup)...\n")
+
+    t0 = time.time()
+    pipeline = get_pipeline(
+        data_dir="data/interview_prep",
+        chunk_size=200,
+        overlap=30,
+        provider="groq",
+    )
+    build_time = time.time() - t0
+    print(f"\nPipeline built in {build_time:.1f}s\n")
+
+    # Run selected modes
+    if run_observe:
+        demo_observability(pipeline)
+
+        # Also show rewrite comparison
+        print(f"\n{'─'*70}")
+        print("  Now showing the same query with REWRITE + HYBRID...")
+        print(f"{'─'*70}")
+        demo_observability(pipeline, strategy=REWRITE_HYBRID)
+
+    if run_compare:
+        demo_comparison(pipeline)
+
+        # Try a second query to show variety
+        print(f"\n{'─'*70}")
+        print("  Second comparison query...")
+        print(f"{'─'*70}")
+        demo_comparison(pipeline, query=DEMO_QUERIES[2])
+
+    if run_eval:
+        demo_evaluation(pipeline, use_ragas=use_ragas)
+
+    if run_interactive:
+        demo_interactive(pipeline)
+
+    print(f"\n{THICK_SEPARATOR}")
+    print("  Session 11 playground complete.")
+    print(THICK_SEPARATOR + "\n")
+
+
+if __name__ == "__main__":
+    main()

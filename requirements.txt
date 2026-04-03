@@ -19,3 +19,9 @@ langchain-groq
 
 # Session 10: Retrieval Optimization
 rank-bm25
+
+# Session 11: RAG Evaluation & Observability
+# Note: ragas and datasets are optional — Session 11 code works without them,
+# falling back to basic evaluation metrics. Install for full RAGAS support.
+ragas
+datasets

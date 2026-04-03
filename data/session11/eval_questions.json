@@ -1,0 +1,62 @@
+[
+  {
+    "question": "What are the interview rounds at Amazon for an SDE role?",
+    "ground_truth": "Amazon's SDE interview process includes an online assessment, phone screen, and onsite loop with 4-5 rounds covering coding, system design, and behavioral questions based on Leadership Principles.",
+    "reference_answer": "Amazon SDE interviews typically involve an online coding assessment, a phone screen, and an onsite loop. The onsite includes coding rounds, a system design round (for senior roles), and behavioral rounds focused on Amazon's Leadership Principles.",
+    "expected_sources": ["amazon.md"]
+  },
+  {
+    "question": "How does Google evaluate problem-solving skills during interviews?",
+    "ground_truth": "Google evaluates problem-solving through coding interviews that test algorithmic thinking, data structure knowledge, and the ability to optimize solutions. Interviewers assess the candidate's approach, communication, and ability to handle follow-up questions.",
+    "reference_answer": "Google uses structured coding interviews where candidates solve algorithmic problems. They evaluate problem decomposition, code quality, optimization ability, and how well candidates communicate their thought process.",
+    "expected_sources": ["google.md"]
+  },
+  {
+    "question": "What is Oracle OCI and how is it relevant to Oracle interviews?",
+    "ground_truth": "Oracle Cloud Infrastructure (OCI) is Oracle's cloud computing platform. OCI knowledge is increasingly relevant in Oracle interviews, especially for cloud engineering and SDE roles, where candidates may be asked about cloud architecture and OCI services.",
+    "reference_answer": "OCI is Oracle's cloud platform. Oracle interviews for cloud-related roles often include questions about OCI services, cloud architecture, and distributed systems built on OCI.",
+    "expected_sources": ["oracle.md"]
+  },
+  {
+    "question": "How should I prepare for a coding assessment?",
+    "ground_truth": "To prepare for coding assessments, practice data structures and algorithms problems, focus on time complexity analysis, use platforms like LeetCode, and practice writing clean code under time constraints. Understanding common patterns like sliding window, two pointers, and dynamic programming is essential.",
+    "reference_answer": "Prepare by practicing DSA problems on LeetCode/HackerRank, focusing on arrays, trees, graphs, and dynamic programming. Practice under timed conditions, write clean code, and learn to explain your approach clearly.",
+    "expected_sources": ["amazon.md", "google.md", "microsoft.md"]
+  },
+  {
+    "question": "What are the differences between initial and final interview rounds at tech companies?",
+    "ground_truth": "Initial rounds typically involve online coding assessments or phone screens that test fundamental coding skills. Final rounds (onsite/virtual loops) are more comprehensive, including system design, behavioral interviews, and deeper technical discussions with multiple interviewers.",
+    "reference_answer": "Initial rounds are screening-focused: online assessments and phone screens testing basic coding. Final rounds are comprehensive onsite loops with system design, behavioral, and advanced coding. The bar rises significantly in final rounds.",
+    "expected_sources": ["amazon.md", "google.md", "microsoft.md"]
+  },
+  {
+    "question": "What are Amazon's Leadership Principles and how are they used in interviews?",
+    "ground_truth": "Amazon's Leadership Principles (LPs) are a set of guidelines that define Amazon's culture. In interviews, behavioral questions are structured around LPs like Customer Obsession, Ownership, and Dive Deep. Candidates should prepare STAR-format stories for each principle.",
+    "reference_answer": "Amazon has 16 Leadership Principles including Customer Obsession, Ownership, Invent and Simplify, and others. Behavioral interview questions at Amazon are explicitly mapped to these LPs. Candidates should prepare specific examples using the STAR method.",
+    "expected_sources": ["amazon.md"]
+  },
+  {
+    "question": "Tell me about the interview process at Microsoft",
+    "ground_truth": "Microsoft's interview process typically includes a phone screen followed by an onsite loop of 4-5 interviews. Rounds cover coding, system design, and behavioral questions. Microsoft uses a collaborative interview style and evaluates both technical skills and growth mindset.",
+    "reference_answer": "Microsoft interviews start with a phone screen, then an onsite loop with 4-5 rounds. They assess coding, system design, and behavioral fit. Microsoft values growth mindset and collaboration, and the final interviewer (the 'as-appropriate') makes the hiring decision.",
+    "expected_sources": ["microsoft.md"]
+  },
+  {
+    "question": "What hiring changes were announced for 2025?",
+    "ground_truth": "Companies have made various updates to their hiring processes for 2025, including changes to interview formats, new assessment methods, and updated evaluation criteria as documented in the 2025 hiring updates.",
+    "reference_answer": "Several companies updated their interview processes for 2025. These changes are documented in the company hiring updates for 2025 and may include format changes, new rounds, or adjusted criteria.",
+    "expected_sources": ["company_hiring_updates_2025.pdf"]
+  },
+  {
+    "question": "What is the system design interview round like at major tech companies?",
+    "ground_truth": "System design rounds at major tech companies test a candidate's ability to design large-scale distributed systems. Candidates are expected to discuss requirements gathering, high-level architecture, component design, data modeling, scalability, and trade-offs.",
+    "reference_answer": "System design rounds involve designing scalable systems. You discuss requirements, API design, data models, high-level architecture, and trade-offs. Companies like Amazon, Google, and Microsoft all include system design for mid-to-senior roles.",
+    "expected_sources": ["amazon.md", "google.md", "microsoft.md"]
+  },
+  {
+    "question": "How does Adobe's interview process differ from other tech companies?",
+    "ground_truth": "Adobe's interview process includes coding rounds, system design, and behavioral interviews. Adobe places emphasis on creativity and product thinking alongside technical skills, reflecting the company's design and creative tool focus.",
+    "reference_answer": "Adobe interviews include standard coding and system design rounds, but also emphasize product sense and creativity. The culture fit assessment focuses on innovation and collaboration, differentiating it from pure engineering-focused companies.",
+    "expected_sources": ["adobe.md"]
+  }
+]
