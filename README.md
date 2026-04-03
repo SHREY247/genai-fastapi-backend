@@ -27,6 +27,7 @@ This session teaches you to build and reason about that retrieval system.
 | `session-8-interview-rag-ingestion` | Session 8 | Multi-source RAG — markdown + PDF ingestion, source-aware answers |
 | `session-9-advanced-rag-frameworks` | Session 9 | Framework-based RAG — LlamaIndex, LangChain, BM25, query rewriting |
 | `session10_retrieval_optimization` | Session 10 | Retrieval Optimization — BM25, Hybrid Search, Query Rewriting, multi-strategy comparison |
+| `session11_rag_evaluation`        | Session 11 | Rerieval Evaluation & Observability — RAGAS, Custom Metrics, side-by-side comparison |
 
 ---
 
@@ -977,3 +978,62 @@ QUERY: 'Bar Raiser veto power'
 | **Hybrid** | 0.82, 0.79, 0.50 | "Both signals agree on the top chunks — they fuse to produce the cleanest ranking." |
 
 > **Bonus**: Run `"OCI hands-on cloud deployment exercise"` for an even more extreme gap — BM25 scores **14.37** vs vector's **0.49** (30x difference).
+
+---
+
+## Session 11 — RAG Evaluation & Observability
+
+Session 11 introduces the **measurement layer** that turns RAG experimentation into engineering.
+
+### Why This Matters
+
+Session 10 taught us *how* to retrieve better. Session 11 teaches us how to *prove* it. We move away from "vibe checks" (eyeballing single results) toward systematic evaluation across datasets.
+
+### New Modules
+
+| Module | Purpose |
+|--------|---------|
+| `app/rag/session11/observability.py` | Pipeline runner with stage-by-stage debug logging |
+| `app/rag/session11/evaluator.py` | Basic metrics (Source Coverage, Context Hit Rate) |
+| `app/rag/session11/ragas_eval.py` | RAGAS integration for AI-powered evaluation |
+| `app/rag/session11/comparison.py` | Side-by-side strategy comparison across datasets |
+| `app/rag/session11/playground.py` | Master demo runner with `--observe`, `--compare`, and `--eval` modes |
+
+### New Dependencies
+
+```bash
+ragas      # AI-powered RAG evaluation
+datasets   # HuggingFace datasets for RAGAS input
+```
+
+---
+
+## Session 11 — Demo Commands
+
+These commands are designed for **live classroom safety**. They use the `--no-answers` flag to skip LLM calls for answers, avoiding 429 rate limits while still showing retrieval quality metrics.
+
+### Step 1 — Observability: Look inside the black box
+**Goal**: See every stage of the pipeline (Rewrite -> Retrieval -> Prompt).
+```bash
+python -m app.rag.session11.playground --observe --no-answers
+```
+
+### Step 2 — Comparison: Side-by-side strategies
+**Goal**: Show how the same query gets different chunks from different retrievers.
+```bash
+python -m app.rag.session11.playground --compare --no-answers
+```
+
+### Step 3 — Evaluation: Scoring the dataset
+**Goal**: Run a 10-question evaluation and see the final score table.
+```bash
+python -m app.rag.session11.playground --eval --no-answers
+```
+
+### Step 4 — End-to-End Proof (Requires API Key)
+**Goal**: Show a complete grounded answer with debug observability.
+```bash
+python -m app.rag.session11.playground --observe
+```
+*Note: This command will call the LLM for the final answer. Use sparingly.*
+
