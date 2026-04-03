@@ -59,9 +59,17 @@ from app.rag.session11.debug_logger import (
     print_debug_report,
     print_comparison_table,
     THICK_SEPARATOR,
+    SEPARATOR,
 )
 from app.rag.session11.comparison import compare_single_query, compare_on_dataset
 from app.rag.session11.dataset import load_eval_dataset, print_dataset_summary
+
+# Session 12 Imports
+try:
+    from app.rag.session12.testing import run_basic_tests, evaluation_loop
+    HAS_SESSION12 = True
+except ImportError:
+    HAS_SESSION12 = False
 
 
 # ---------------------------------------------------------------------------
@@ -179,6 +187,29 @@ def demo_evaluation(pipeline, use_ragas: bool = False, generate_answer: bool = T
 
 
 # ---------------------------------------------------------------------------
+# Mode E: Session 12 QA & Testing
+# ---------------------------------------------------------------------------
+
+def demo_testing(pipeline):
+    """
+    Demonstrates Session 12's 'RAG QA & Production Testing' logic.
+    """
+    if not HAS_SESSION12:
+        print("\n[ERROR] Session 12 modules not found. Check app/rag/session12/.")
+        return
+
+    print(f"\n{'#'*70}")
+    print(f"#  MODE E: SESSION 12 — QA & PRODUCTION TESTING")
+    print(f"{'#'*70}")
+
+    # 1. Run simulated unit tests
+    run_basic_tests(strategy_name=HYBRID, pipeline=pipeline)
+
+    # 2. Run pseudo production loop demo
+    evaluation_loop(pipeline=pipeline)
+
+
+# ---------------------------------------------------------------------------
 # Mode D: Interactive
 # ---------------------------------------------------------------------------
 
@@ -246,12 +277,13 @@ def main():
     run_observe    = "--observe"     in args
     run_compare    = "--compare"     in args
     run_eval       = "--eval"        in args
+    run_test       = "--test"        in args # Session 12
     run_interactive= "--interactive" in args
     use_ragas      = "--ragas"       in args
     generate_answer= "--no-answers" not in args  # False when --no-answers passed
 
     # Default: run observability + comparison demos
-    if not any([run_observe, run_compare, run_eval, run_interactive]):
+    if not any([run_observe, run_compare, run_eval, run_test, run_interactive]):
         run_observe = True
         run_compare = True
 
@@ -293,6 +325,9 @@ def main():
 
     if run_eval:
         demo_evaluation(pipeline, use_ragas=use_ragas, generate_answer=generate_answer)
+
+    if run_test:
+        demo_testing(pipeline)
 
     if run_interactive:
         demo_interactive(pipeline)
